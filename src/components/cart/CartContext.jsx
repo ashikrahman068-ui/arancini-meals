@@ -92,7 +92,12 @@ export const CartProvider = ({ children }) => {
     return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
 
+  const getSubtotal = () => {
+    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+  };
+
   const value = {
+    items: cartItems,
     cartItems,
     addToCart,
     removeFromCart,
@@ -101,6 +106,7 @@ export const CartProvider = ({ children }) => {
     clearCart,
     getTotalItems,
     getTotalPrice,
+    getSubtotal,
   };
 
   return (
