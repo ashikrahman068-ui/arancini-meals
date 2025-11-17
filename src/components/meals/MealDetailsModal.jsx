@@ -1,5 +1,6 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { base44 } from '@/api/base44Client';
 import {
   Dialog,
   DialogContent,
@@ -18,10 +19,71 @@ import {
   X,
   Star,
   Leaf,
-  Zap
+  Zap,
+  MessageSquare
 } from "lucide-react";
+import ReviewForm from '../reviews/ReviewForm';
+import ReviewList from '../reviews/ReviewList';
 
 export default function MealDetailsModal({ meal, isOpen, onClose, onAddToCart }) {
+  const [reviews, setReviews] = useState([]);
+  const [loadingReviews, setLoadingReviews] = useState(false);
+  const [user, setUser] = useState(null);
+  const [userOrders, setUserOrders] = useState([]);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+
+  useEffect(() => {
+    if (isOpen && meal) {
+      loadReviews();
+      checkUserPurchase();
+    }
+  }, [isOpen, meal]);
+
+  const loadReviews = async () => {
+    if (!meal) return;
+    
+    setLoadingReviews(true);
+    try {
+      const fetchedReviews = await base44.entities.Review.filter(
+        { meal_id: meal.id },
+        '-created_date'
+      );
+      setReviews(fetchedReviews);
+    } catch (error) {
+      console.error('Error loading reviews:', error);
+    } finally {
+      setLoadingReviews(false);
+    }
+  };
+
+  const checkUserPurchase = async () => {
+    try {
+      const currentUser = await base44.auth.me();
+      setUser(currentUser);
+
+      // Check if user has ordered this meal
+      const orders = await base44.entities.Order.filter({
+        customer_email: currentUser.email
+      });
+
+      const hasPurchased = orders.some(order => 
+        order.items?.some(item => item.meal_id === meal.id)
+      );
+
+      setUserOrders(orders);
+      setShowReviewForm(hasPurchased);
+    } catch (error) {
+      // User not logged in or error fetching user/orders
+      setUser(null);
+      setShowReviewForm(false);
+    }
+  };
+
+  const handleReviewSubmitted = () => {
+    loadReviews(); // Reload reviews to show the new one
+    setShowReviewForm(false); // Optionally hide the form after submission, or refresh it
+  };
+
   if (!meal) return null;
 
   const getDietaryBadgeColor = (tag) => {
@@ -51,6 +113,11 @@ export default function MealDetailsModal({ meal, isOpen, onClose, onAddToCart })
     }
     return `${minutes} minutes`;
   };
+
+  // Calculate average rating
+  const averageRating = reviews.length > 0
+    ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+    : 0;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -111,6 +178,31 @@ export default function MealDetailsModal({ meal, isOpen, onClose, onAddToCart })
               <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
                 {meal.name}
               </h1>
+              
+              {/* Rating Summary */}
+              {reviews.length > 0 && (
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        className={`w-5 h-5 ${
+                          star <= Math.round(averageRating)
+                            ? 'fill-yellow-400 text-yellow-400'
+                            : 'text-gray-300'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-sm font-semibold text-gray-700">
+                    {averageRating.toFixed(1)}
+                  </span>
+                  <span className="text-sm text-gray-500">
+                    ({reviews.length} review{reviews.length !== 1 ? 's' : ''})
+                  </span>
+                </div>
+              )}
+              
               <p className="text-gray-600 leading-relaxed">
                 {meal.description}
               </p>
@@ -179,9 +271,9 @@ export default function MealDetailsModal({ meal, isOpen, onClose, onAddToCart })
           </div>
         </div>
 
+        {/* Comprehensive Nutrition Information */}
         <Separator className="my-6" />
 
-        {/* Comprehensive Nutrition Information */}
         {meal.nutrition && (
           <div className="space-y-4">
             <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
@@ -305,6 +397,52 @@ export default function MealDetailsModal({ meal, isOpen, onClose, onAddToCart })
             </div>
           </>
         )}
+
+        {/* Reviews Section */}
+        <Separator className="my-6" />
+        <div className="space-y-4">
+          <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+            <MessageSquare className="w-5 h-5 text-green-500" />
+            Customer Reviews ({reviews.length})
+          </h3>
+
+          {/* Review Form - Only shown if user has purchased */}
+          {showReviewForm && user && (
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-3">Write a Review</h4>
+              <ReviewForm 
+                meal={meal} 
+                orderId={userOrders.find(order => order.items?.some(item => item.meal_id === meal.id))?.id}
+                onReviewSubmitted={handleReviewSubmitted}
+              />
+            </div>
+          )}
+
+          {!user && (
+            <div className="text-center py-4 bg-gray-50 rounded-lg">
+              <p className="text-sm text-gray-600">
+                Log in to leave a review after purchasing this meal.
+              </p>
+            </div>
+          )}
+          
+          {user && !showReviewForm && (
+            <div className="text-center py-4 bg-gray-50 rounded-lg">
+              <p className="text-sm text-gray-600">
+                You can write a review after purchasing this meal.
+              </p>
+            </div>
+          )}
+
+          {/* Reviews List */}
+          {loadingReviews ? (
+            <div className="text-center py-8">
+              <div className="animate-spin w-6 h-6 border-2 border-green-600 border-t-transparent rounded-full mx-auto"></div>
+            </div>
+          ) : (
+            <ReviewList reviews={reviews} />
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   );

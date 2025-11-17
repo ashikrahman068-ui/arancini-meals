@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -45,6 +46,8 @@ export default function MealFilters({
 
   const sortOptions = [
     { value: 'popularity', label: 'Most Popular' },
+    { value: 'rating_high', label: 'Highest Rated' }, // Added
+    { value: 'rating_low', label: 'Lowest Rated' },   // Added
     { value: 'price_low', label: 'Price: Low to High' },
     { value: 'price_high', label: 'Price: High to Low' },
     { value: 'calories_low', label: 'Lowest Calories' },

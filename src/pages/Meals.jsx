@@ -1,5 +1,7 @@
+
 import React, { useState, useEffect, useMemo } from "react";
-import { Meal } from "@/entities/Meal";
+import { base44 } from "@/api/base44Client";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -18,6 +20,7 @@ import MealDetailsModal from "../components/meals/MealDetailsModal";
 
 export default function Meals() {
   const [meals, setMeals] = useState([]);
+  const [reviews, setReviews] = useState([]); // Added reviews state
   const [isLoading, setIsLoading] = useState(true);
   const [viewMode, setViewMode] = useState('grid');
   const [selectedMeal, setSelectedMeal] = useState(null);
@@ -39,8 +42,28 @@ export default function Meals() {
   const loadMeals = async () => {
     setIsLoading(true);
     try {
-      const fetchedMeals = await Meal.list();
-      setMeals(fetchedMeals);
+      // Changed to use base44.entities.Meal and fetch reviews concurrently
+      const [fetchedMeals, fetchedReviews] = await Promise.all([
+        base44.entities.Meal.list(),
+        base44.entities.Review.list()
+      ]);
+      
+      // Calculate average ratings for each meal
+      const mealsWithRatings = fetchedMeals.map(meal => {
+        const mealReviews = fetchedReviews.filter(r => r.meal_id === meal.id);
+        const averageRating = mealReviews.length > 0
+          ? mealReviews.reduce((sum, r) => sum + r.rating, 0) / mealReviews.length
+          : 0;
+        
+        return {
+          ...meal,
+          average_rating: averageRating,
+          review_count: mealReviews.length
+        };
+      });
+      
+      setMeals(mealsWithRatings);
+      setReviews(fetchedReviews); // Set reviews state
     } catch (error) {
       console.error('Error loading meals:', error);
     }
@@ -83,6 +106,10 @@ export default function Meals() {
     // Sort meals
     filtered.sort((a, b) => {
       switch (sortBy) {
+        case 'rating_high': // Added rating sort option
+          return (b.average_rating || 0) - (a.average_rating || 0);
+        case 'rating_low': // Added rating sort option
+          return (a.average_rating || 0) - (b.average_rating || 0);
         case 'price_low':
           return (a.price || 0) - (b.price || 0);
         case 'price_high':
