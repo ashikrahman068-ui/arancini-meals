@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -37,6 +36,25 @@ function LayoutContent({ children, currentPageName }) {
   React.useEffect(() => {
     checkAuthentication();
   }, [location.pathname]);
+
+  React.useEffect(() => {
+    // Sync new user to HubSpot after authentication
+    const syncNewUser = async () => {
+      if (isAuthenticated && sessionStorage.getItem('new_signup') === 'true') {
+        sessionStorage.removeItem('new_signup');
+        try {
+          const user = await base44.auth.me();
+          await base44.functions.invoke('hubspotSyncContact', {
+            email: user.email,
+            full_name: user.full_name
+          });
+        } catch (error) {
+          console.error('Failed to sync to HubSpot:', error);
+        }
+      }
+    };
+    syncNewUser();
+  }, [isAuthenticated]);
 
   const checkAuthentication = async () => {
     try {

@@ -38,7 +38,9 @@ export default function Welcome() {
     navigate(createPageUrl('Home'));
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
+    // Store that user is signing up for HubSpot tracking
+    sessionStorage.setItem('new_signup', 'true');
     base44.auth.redirectToLogin(window.location.origin + createPageUrl('Home'));
   };
 
