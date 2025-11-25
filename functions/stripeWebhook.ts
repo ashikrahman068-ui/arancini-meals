@@ -39,11 +39,24 @@ Deno.serve(async (req) => {
 
                 // Update order status
                 if (orderId) {
-                    await base44.asServiceRole.entities.Order.update(orderId, {
+                    const order = await base44.asServiceRole.entities.Order.update(orderId, {
                         payment_status: 'paid',
                         status: 'confirmed',
                         payment_method: 'stripe'
                     });
+
+                    // Sync order to HubSpot as a deal
+                    try {
+                        await base44.asServiceRole.functions.invoke('hubspotCreateDeal', {
+                            order_id: order.id,
+                            order_number: order.order_number,
+                            total: order.total,
+                            items: order.items,
+                            status: order.status
+                        });
+                    } catch (hubspotError) {
+                        console.error('HubSpot sync failed:', hubspotError);
+                    }
                 }
 
                 // Update subscription status
