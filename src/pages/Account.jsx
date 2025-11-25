@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
@@ -7,11 +6,13 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, User as UserIcon, LogOut, Gift, UserPlus, LogIn } from 'lucide-react';
+import { Loader2, User as UserIcon, LogOut, Gift, UserPlus, LogIn, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import ReferralSection from '../components/account/ReferralSection';
+import SubscriptionManagement from '../components/subscription/SubscriptionManagement';
+import SkipDelivery from '../components/subscription/SkipDelivery';
 
 export default function Account() {
   const [user, setUser] = useState(null);
@@ -19,11 +20,19 @@ export default function Account() {
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
+  const [subscriptions, setSubscriptions] = useState([]);
+  const [loadingSubscriptions, setLoadingSubscriptions] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchUser();
   }, []);
+
+  useEffect(() => {
+    if (user && activeTab === 'subscriptions') {
+      loadSubscriptions();
+    }
+  }, [user, activeTab]);
 
   const fetchUser = async () => {
     try {
@@ -50,6 +59,20 @@ export default function Account() {
     } catch (error) {
       console.error('Error refreshing user data:', error);
       toast.error('Failed to refresh user data.');
+    }
+  };
+
+  const loadSubscriptions = async () => {
+    setLoadingSubscriptions(true);
+    try {
+      const subs = await base44.entities.Subscription.filter({
+        user_email: user.email
+      });
+      setSubscriptions(subs);
+    } catch (error) {
+      console.error('Error loading subscriptions:', error);
+    } finally {
+      setLoadingSubscriptions(false);
     }
   };
   
@@ -180,10 +203,14 @@ export default function Account() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
+          <TabsList className="grid w-full grid-cols-3 lg:w-[600px]">
             <TabsTrigger value="profile">
               <UserIcon className="w-4 h-4 mr-2" />
               Profile
+            </TabsTrigger>
+            <TabsTrigger value="subscriptions">
+              <Calendar className="w-4 h-4 mr-2" />
+              Subscriptions
             </TabsTrigger>
             <TabsTrigger value="referrals">
               <Gift className="w-4 h-4 mr-2" />
@@ -246,6 +273,41 @@ export default function Account() {
                 </CardContent>
               </Card>
             </form>
+          </TabsContent>
+
+          <TabsContent value="subscriptions">
+            {loadingSubscriptions ? (
+              <div className="flex justify-center items-center py-12">
+                <Loader2 className="w-8 h-8 animate-spin text-green-600" />
+              </div>
+            ) : subscriptions.length === 0 ? (
+              <Card>
+                <CardContent className="text-center py-12">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Calendar className="w-8 h-8 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No Active Subscriptions</h3>
+                  <p className="text-gray-600 mb-6">Start a subscription to get regular meal deliveries.</p>
+                  <Button onClick={() => navigate(createPageUrl('Subscriptions'))}>
+                    Browse Subscription Plans
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-6">
+                {subscriptions.map((subscription) => (
+                  <div key={subscription.id} className="space-y-4">
+                    <SubscriptionManagement 
+                      subscription={subscription} 
+                      onUpdate={loadSubscriptions}
+                    />
+                    {subscription.status === 'active' && (
+                      <SkipDelivery subscription={subscription} />
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="referrals">
