@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
@@ -356,6 +355,28 @@ export default function ManageBlog() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
+                      {post.status === 'draft' && (
+                        <Button
+                          variant="default"
+                          size="sm"
+                          className="bg-green-600 hover:bg-green-700"
+                          onClick={async () => {
+                            try {
+                              await base44.entities.BlogPost.update(post.id, {
+                                status: 'published',
+                                published_date: new Date().toISOString()
+                              });
+                              toast.success('Post published successfully!');
+                              fetchUserAndPosts();
+                            } catch (error) {
+                              toast.error('Failed to publish post');
+                            }
+                          }}
+                        >
+                          <Eye className="w-4 h-4 mr-1" />
+                          Publish
+                        </Button>
+                      )}
                       <Button
                         variant="outline"
                         size="sm"
