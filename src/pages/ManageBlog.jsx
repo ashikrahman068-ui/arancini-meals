@@ -151,7 +151,7 @@ export default function ManageBlog() {
         author_email: user.email,
         author_name: user.full_name,
         status: publishNow ? 'published' : formData.status,
-        published_date: publishNow ? new Date().toISOString() : formData.published_date
+        published_date: (publishNow || formData.status === 'published') ? new Date().toISOString() : formData.published_date
       };
 
       if (formData.id) {
