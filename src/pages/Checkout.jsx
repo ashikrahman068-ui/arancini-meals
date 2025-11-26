@@ -138,7 +138,7 @@ export default function Checkout() {
       });
 
       // Create Stripe checkout session
-      const { data: checkoutData } = await base44.functions.invoke('createCheckout', {
+      const checkoutData = await base44.functions.invoke('createCheckout', {
         items: checkoutItems,
         mode: 'payment',
         orderId: order.id,
