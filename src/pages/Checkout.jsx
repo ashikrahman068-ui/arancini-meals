@@ -160,7 +160,8 @@ export default function Checkout() {
 
     } catch (error) {
       console.error('Checkout error:', error);
-      toast.error('Failed to process checkout. Please try again.');
+      const errorMessage = error?.message || error?.error || 'Failed to process checkout. Please try again.';
+      toast.error(errorMessage);
       setProcessing(false);
     }
   };
