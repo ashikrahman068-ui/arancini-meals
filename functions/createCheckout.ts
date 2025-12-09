@@ -23,24 +23,32 @@ Deno.serve(async (req) => {
         const origin = url.origin;
 
         // Create line items for Stripe
-        const lineItems = items.map(item => ({
-            price_data: {
-                currency: 'usd',
-                product_data: {
-                    name: item.name,
-                    description: item.description || '',
-                    images: item.image_url ? [item.image_url] : [],
+        const lineItems = items.map(item => {
+            const productData = {
+                name: item.name,
+                description: item.description || '',
+            };
+            
+            // Only add images if URL is valid (starts with http:// or https://)
+            if (item.image_url && (item.image_url.startsWith('http://') || item.image_url.startsWith('https://'))) {
+                productData.images = [item.image_url];
+            }
+            
+            return {
+                price_data: {
+                    currency: 'usd',
+                    product_data: productData,
+                    unit_amount: Math.round(item.price * 100), // Convert to cents
+                    ...(mode === 'subscription' && item.recurring && {
+                        recurring: {
+                            interval: item.recurring.interval || 'week',
+                            interval_count: item.recurring.interval_count || 1,
+                        }
+                    })
                 },
-                unit_amount: Math.round(item.price * 100), // Convert to cents
-                ...(mode === 'subscription' && item.recurring && {
-                    recurring: {
-                        interval: item.recurring.interval || 'week',
-                        interval_count: item.recurring.interval_count || 1,
-                    }
-                })
-            },
-            quantity: item.quantity || 1,
-        }));
+                quantity: item.quantity || 1,
+            };
+        });
 
         // Create Stripe checkout session
         const session = await stripe.checkout.sessions.create({
