@@ -111,13 +111,21 @@ export default function Checkout() {
       const order = await base44.entities.Order.create(orderData);
 
       // Prepare items for Stripe checkout
-      const checkoutItems = items.map(item => ({
-        name: item.name,
-        description: item.description,
-        price: item.price,
-        quantity: item.quantity,
-        image_url: item.image_url
-      }));
+      const checkoutItems = items.map(item => {
+        const checkoutItem = {
+          name: item.name,
+          description: item.description || '',
+          price: item.price,
+          quantity: item.quantity
+        };
+        
+        // Only include image_url if it's a valid HTTP(S) URL
+        if (item.image_url && (item.image_url.startsWith('http://') || item.image_url.startsWith('https://'))) {
+          checkoutItem.image_url = item.image_url;
+        }
+        
+        return checkoutItem;
+      });
 
       // Add delivery fee if applicable
       if (deliveryFee > 0) {
@@ -148,12 +156,16 @@ export default function Checkout() {
         }
       });
 
-      if (checkoutData.url) {
+      console.log('Checkout response:', checkoutData);
+
+      if (checkoutData?.url) {
         // Clear cart before redirecting
         clearCart();
         
         // Redirect to Stripe checkout
         window.location.href = checkoutData.url;
+      } else if (checkoutData?.error) {
+        throw new Error(checkoutData.error);
       } else {
         throw new Error('Failed to create checkout session');
       }
