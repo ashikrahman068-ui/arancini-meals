@@ -146,7 +146,7 @@ export default function Checkout() {
       });
 
       // Create Stripe checkout session
-      const checkoutData = await base44.functions.invoke('createCheckout', {
+      const response = await base44.functions.invoke('createCheckout', {
         items: checkoutItems,
         mode: 'payment',
         orderId: order.id,
@@ -156,23 +156,26 @@ export default function Checkout() {
         }
       });
 
-      console.log('Checkout response:', checkoutData);
+      console.log('Checkout response:', response);
 
-      if (checkoutData?.url) {
+      // Check if response has url property
+      if (response?.url) {
         // Clear cart before redirecting
         clearCart();
         
         // Redirect to Stripe checkout
-        window.location.href = checkoutData.url;
-      } else if (checkoutData?.error) {
-        throw new Error(checkoutData.error);
+        window.location.href = response.url;
+      } else if (response?.error) {
+        throw new Error(response.error);
       } else {
-        throw new Error('Failed to create checkout session');
+        console.error('Invalid response format:', response);
+        throw new Error('Invalid response from payment provider. Please try again.');
       }
 
     } catch (error) {
       console.error('Checkout error:', error);
-      const errorMessage = error?.message || error?.error || 'Failed to process checkout. Please try again.';
+      console.error('Error details:', JSON.stringify(error));
+      const errorMessage = error?.response?.data?.error || error?.message || 'Failed to process checkout. Please try again.';
       toast.error(errorMessage);
       setProcessing(false);
     }
