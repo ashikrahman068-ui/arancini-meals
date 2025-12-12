@@ -59,15 +59,38 @@ Deno.serve(async (req) => {
                     }
                 }
 
-                // Update subscription status
+                // Update subscription status and save Stripe IDs
                 if (subscriptionId) {
+                    const subscription = await base44.asServiceRole.entities.Subscription.get(subscriptionId);
+                    
                     await base44.asServiceRole.entities.Subscription.update(subscriptionId, {
                         status: 'active',
+                        stripe_subscription_id: session.subscription || session.id,
+                        stripe_customer_id: session.customer,
                         billing_info: {
+                            ...subscription.billing_info,
                             payment_method: 'stripe',
-                            last_payment_date: new Date().toISOString(),
+                            last_payment_date: new Date().toISOString().split('T')[0],
                         }
                     });
+
+                    console.log('Subscription activated:', subscriptionId);
+                }
+                break;
+            }
+
+            case 'customer.subscription.created': {
+                const subscription = event.data.object;
+                const subscriptionId = subscription.metadata?.subscription_id;
+                
+                if (subscriptionId) {
+                    await base44.asServiceRole.entities.Subscription.update(subscriptionId, {
+                        stripe_subscription_id: subscription.id,
+                        stripe_customer_id: subscription.customer,
+                        status: 'active'
+                    });
+                    
+                    console.log('Stripe subscription created and linked:', subscription.id);
                 }
                 break;
             }
@@ -88,19 +111,84 @@ Deno.serve(async (req) => {
 
             case 'customer.subscription.updated': {
                 const subscription = event.data.object;
+                
+                // Find subscription by stripe_subscription_id
+                const subscriptions = await base44.asServiceRole.entities.Subscription.filter({
+                    stripe_subscription_id: subscription.id
+                });
+                
+                if (subscriptions.length > 0) {
+                    const subId = subscriptions[0].id;
+                    await base44.asServiceRole.entities.Subscription.update(subId, {
+                        status: subscription.status === 'active' ? 'active' : 
+                               subscription.status === 'canceled' ? 'cancelled' : 
+                               subscription.status === 'paused' ? 'paused' : 'active'
+                    });
+                }
+                
                 console.log('Subscription updated:', subscription.id);
                 break;
             }
 
             case 'customer.subscription.deleted': {
                 const subscription = event.data.object;
-                const subscriptionId = subscription.metadata?.subscription_id;
                 
-                if (subscriptionId) {
-                    await base44.asServiceRole.entities.Subscription.update(subscriptionId, {
+                // Find subscription by stripe_subscription_id
+                const subscriptions = await base44.asServiceRole.entities.Subscription.filter({
+                    stripe_subscription_id: subscription.id
+                });
+                
+                if (subscriptions.length > 0) {
+                    const subId = subscriptions[0].id;
+                    await base44.asServiceRole.entities.Subscription.update(subId, {
                         status: 'cancelled'
                     });
                 }
+                break;
+            }
+
+            case 'invoice.payment_succeeded': {
+                const invoice = event.data.object;
+                
+                // Find subscription by stripe_subscription_id
+                if (invoice.subscription) {
+                    const subscriptions = await base44.asServiceRole.entities.Subscription.filter({
+                        stripe_subscription_id: invoice.subscription
+                    });
+                    
+                    if (subscriptions.length > 0) {
+                        const subscription = subscriptions[0];
+                        await base44.asServiceRole.entities.Subscription.update(subscription.id, {
+                            billing_info: {
+                                ...subscription.billing_info,
+                                last_payment_date: new Date().toISOString().split('T')[0],
+                                billing_cycle_count: (subscription.billing_info?.billing_cycle_count || 0) + 1
+                            }
+                        });
+                    }
+                }
+                
+                console.log('Invoice payment succeeded:', invoice.id);
+                break;
+            }
+
+            case 'invoice.payment_failed': {
+                const invoice = event.data.object;
+                
+                // Find subscription and mark as having payment issues
+                if (invoice.subscription) {
+                    const subscriptions = await base44.asServiceRole.entities.Subscription.filter({
+                        stripe_subscription_id: invoice.subscription
+                    });
+                    
+                    if (subscriptions.length > 0) {
+                        await base44.asServiceRole.entities.Subscription.update(subscriptions[0].id, {
+                            notes: `Payment failed on ${new Date().toISOString().split('T')[0]}`
+                        });
+                    }
+                }
+                
+                console.log('Invoice payment failed:', invoice.id);
                 break;
             }
 

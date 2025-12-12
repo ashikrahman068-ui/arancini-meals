@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
@@ -197,7 +196,7 @@ export default function SubscriptionCheckout() {
       meals_per_week: plan.mealsPerWeek,
       price_per_delivery: plan.price,
       discount_percentage: plan.savings,
-      status: 'active',
+      status: 'pending',
       meal_preferences: {
         selected_meals: selectedMeals,
         dietary_preferences: formData.dietaryPreferences,
@@ -216,49 +215,84 @@ export default function SubscriptionCheckout() {
         special_instructions: formData.specialInstructions
       },
       billing_info: {
-        payment_method: paymentMethod === 'card' ? `Card **** ${formData.cardNumber.slice(-4)}` : paymentMethod,
-        last_payment_date: new Date().toISOString().split('T')[0],
+        payment_method: paymentMethod,
         next_billing_date: calculateNextBillingDate(),
         billing_cycle_count: 0
       },
       start_date: new Date().toISOString().split('T')[0],
-      discount_code: referralCode.toUpperCase() || null // Added discount_code
+      discount_code: referralCode.toUpperCase() || null
     };
 
     try {
       const newSubscription = await base44.entities.Subscription.create(subscriptionData);
       
-      // Handle referral reward
+      // Create Stripe checkout for subscription
+      const intervalMap = {
+        'weekly': 'week',
+        'bi-weekly': 'week',
+        'monthly': 'month'
+      };
+
+      const intervalCountMap = {
+        'weekly': 1,
+        'bi-weekly': 2,
+        'monthly': 1
+      };
+
+      const checkoutItems = [{
+        name: `${plan.name} Subscription`,
+        description: `${plan.mealsPerWeek} meals per ${plan.frequency}`,
+        price: currentTotal,
+        quantity: 1,
+        recurring: {
+          interval: intervalMap[plan.frequency],
+          interval_count: intervalCountMap[plan.frequency]
+        }
+      }];
+
+      const checkoutResponse = await base44.functions.invoke('createCheckout', {
+        items: checkoutItems,
+        mode: 'subscription',
+        subscriptionId: newSubscription.id,
+        metadata: {
+          subscription_id: newSubscription.id,
+          plan_name: plan.name,
+          meals_per_week: plan.mealsPerWeek,
+          referral_code: referralCode || ''
+        }
+      });
+
+      if (!checkoutResponse?.url) {
+        throw new Error('Failed to create checkout session');
+      }
+
+      // Handle referral reward after checkout creation
       if (referralDiscount > 0 && referralCode) {
         try {
           const referrers = await base44.entities.User.filter({ referral_code: referralCode.toUpperCase() });
           if (referrers.length > 0) {
             const referrer = referrers[0];
             
-            // Create referral record
             await base44.entities.Referral.create({
               referrer_email: referrer.email,
               referrer_code: referralCode.toUpperCase(),
               referred_email: user.email,
-              status: 'completed',
+              status: 'pending',
               reward_type: 'credit',
-              referrer_reward_amount: 20, // Example reward amount for referrer
-              referred_reward_amount: 10, // Example reward amount for referred (the current user)
-              completion_date: new Date().toISOString().split('T')[0],
+              referrer_reward_amount: 20,
+              referred_reward_amount: 10,
               subscription_id: newSubscription.id
             });
 
-            // Update user with referral info
             await base44.auth.updateMe({ referred_by: referralCode.toUpperCase() });
           }
         } catch (error) {
           console.error('Error processing referral:', error);
-          // Don't block subscription success for referral error, but log it.
         }
       }
 
-      toast.success('Subscription created successfully!');
-      navigate(createPageUrl('ManageSubscription'));
+      // Redirect to Stripe checkout
+      window.location.href = checkoutResponse.url;
     } catch (error) {
       console.error('Subscription creation error:', error);
       toast.error('Failed to create subscription. Please try again.');
