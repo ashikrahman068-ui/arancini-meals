@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
@@ -19,7 +18,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Loader2, ShoppingBag, ArrowRight, Package, MapPin, Calendar, LogIn, UserPlus, Receipt } from 'lucide-react';
+import { Loader2, ShoppingBag, ArrowRight, Package, MapPin, Calendar, LogIn, UserPlus, Receipt, Download } from 'lucide-react';
 import { toast } from 'sonner';
 
 const statusColors = {
@@ -74,6 +73,34 @@ export default function Orders() {
 
   const handleLogin = () => {
     base44.auth.redirectToLogin(window.location.origin + createPageUrl('Orders'));
+  };
+
+  const handleExportOrders = async () => {
+    try {
+      const response = await base44.functions.invoke('exportOrdersXlsx', {});
+      
+      // Create blob from response data
+      const blob = new Blob([response], { 
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+      });
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `orders_export_${new Date().toISOString().split('T')[0]}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      
+      // Cleanup
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      toast.success('Orders exported successfully');
+    } catch (error) {
+      console.error('Export error:', error);
+      toast.error('Failed to export orders. Please try again.');
+    }
   };
 
   if (loading) {
@@ -163,7 +190,18 @@ export default function Orders() {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">My Orders</h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">My Orders</h1>
+          {user?.role === 'admin' && orders.length > 0 && (
+            <Button 
+              onClick={handleExportOrders}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Download Orders (Excel)
+            </Button>
+          )}
+        </div>
 
         {orders.length === 0 ? (
           <Card>
