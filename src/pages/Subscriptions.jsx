@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
@@ -130,11 +129,12 @@ export default function Subscriptions() {
   const handleSubscribe = (plan) => {
     if (!user) {
       toast.error('Please log in to subscribe');
+      base44.auth.redirectToLogin();
       return;
     }
 
     // Navigate to subscription checkout with plan data
-    navigate(createPageUrl(`SubscriptionCheckout?planId=${plan.id}`));
+    navigate(`${createPageUrl('SubscriptionCheckout')}?planId=${plan.id}`);
   };
 
   const handleManageSubscription = () => {
