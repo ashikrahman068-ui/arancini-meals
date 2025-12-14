@@ -33,7 +33,6 @@ export default function SubscriptionCheckout() {
   const [submitting, setSubmitting] = useState(false);
   const [selectedMeals, setSelectedMeals] = useState([]);
   const [availableMeals, setAvailableMeals] = useState([]);
-  const [paymentMethod, setPaymentMethod] = useState('card');
   const [referralCode, setReferralCode] = useState(refCode ? refCode.toUpperCase() : ''); // Initialize with refCode, ensure uppercase
   const [referralDiscount, setReferralDiscount] = useState(0);
   const [validatingReferral, setValidatingReferral] = useState(false);
@@ -48,10 +47,6 @@ export default function SubscriptionCheckout() {
     state: '',
     zip: '',
     specialInstructions: '',
-    cardNumber: '',
-    cardName: '',
-    expiryDate: '',
-    cvc: '',
     dietaryPreferences: []
   });
 
@@ -183,12 +178,6 @@ export default function SubscriptionCheckout() {
       return;
     }
 
-    if (paymentMethod === 'card' && (!formData.cardNumber || !formData.cardName || !formData.expiryDate || !formData.cvc)) {
-      toast.error('Please fill in all payment details');
-      setSubmitting(false);
-      return;
-    }
-
     const subscriptionData = {
       user_email: user.email,
       plan_type: plan.frequency,
@@ -215,7 +204,7 @@ export default function SubscriptionCheckout() {
         special_instructions: formData.specialInstructions
       },
       billing_info: {
-        payment_method: paymentMethod,
+        payment_method: 'stripe',
         next_billing_date: calculateNextBillingDate(),
         billing_cycle_count: 0
       },
@@ -501,40 +490,24 @@ export default function SubscriptionCheckout() {
               </CardContent>
             </Card>
 
-            {/* Payment Method */}
+            {/* Payment Info */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <CreditCard className="w-5 h-5" />
-                  Payment Method
+                  <Lock className="w-5 h-5" />
+                  Secure Payment
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
-                  <div className="flex items-center space-x-3 p-4 border-2 rounded-lg cursor-pointer" onClick={() => setPaymentMethod('card')}>
-                    <RadioGroupItem value="card" id="card" />
-                    <Label htmlFor="card" className="flex-1 cursor-pointer">Credit / Debit Card</Label>
-                  </div>
-                  <div className="flex items-center space-x-3 p-4 border-2 rounded-lg cursor-pointer" onClick={() => setPaymentMethod('paypal')}>
-                    <RadioGroupItem value="paypal" id="paypal" />
-                    <Label htmlFor="paypal" className="flex-1 cursor-pointer">PayPal</Label>
-                  </div>
-                </RadioGroup>
-
-                {paymentMethod === 'card' && (
-                  <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
-                    <Input placeholder="Card Number" value={formData.cardNumber} onChange={(e) => handleInputChange('cardNumber', e.target.value)} required />
-                    <Input placeholder="Name on Card" value={formData.cardName} onChange={(e) => handleInputChange('cardName', e.target.value)} required />
-                    <div className="grid grid-cols-2 gap-4">
-                      <Input placeholder="MM/YY" value={formData.expiryDate} onChange={(e) => handleInputChange('expiryDate', e.target.value)} required />
-                      <Input placeholder="CVC" value={formData.cvc} onChange={(e) => handleInputChange('cvc', e.target.value)} required />
-                    </div>
-                  </div>
-                )}
-
+              <CardContent className="space-y-4">
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-900">
+                    You'll be redirected to Stripe's secure checkout to complete your payment. 
+                    Stripe accepts all major credit cards, debit cards, and digital wallets.
+                  </p>
+                </div>
                 <div className="flex items-center gap-2 text-xs text-gray-500">
                   <Lock className="w-4 h-4" />
-                  <span>Your payment information is secure and encrypted</span>
+                  <span>Secured by Stripe - Your payment information is encrypted</span>
                 </div>
               </CardContent>
             </Card>
@@ -601,12 +574,21 @@ export default function SubscriptionCheckout() {
                 </div>
 
                 <Button type="submit" className="w-full bg-green-600 hover:bg-green-700" size="lg" disabled={submitting}>
-                  {submitting ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
-                  Confirm Subscription
+                  {submitting ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <Lock className="w-4 h-4 mr-2" />
+                      Proceed to Payment
+                    </>
+                  )}
                 </Button>
 
                 <p className="text-xs text-center text-gray-500">
-                  By subscribing, you agree to recurring billing
+                  You'll be redirected to Stripe to complete payment
                 </p>
               </CardContent>
             </Card>
