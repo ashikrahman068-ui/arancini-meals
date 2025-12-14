@@ -33,9 +33,11 @@ export default function SubscriptionCheckout() {
   const [submitting, setSubmitting] = useState(false);
   const [selectedMeals, setSelectedMeals] = useState([]);
   const [availableMeals, setAvailableMeals] = useState([]);
-  const [referralCode, setReferralCode] = useState(refCode ? refCode.toUpperCase() : ''); // Initialize with refCode, ensure uppercase
+  const [referralCode, setReferralCode] = useState(refCode ? refCode.toUpperCase() : '');
   const [referralDiscount, setReferralDiscount] = useState(0);
   const [validatingReferral, setValidatingReferral] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('card');
+  const [cutoffError, setCutoffError] = useState(null);
 
   const plan = subscriptionPlans[planId];
 
@@ -166,6 +168,22 @@ export default function SubscriptionCheckout() {
     e.preventDefault();
     setSubmitting(true);
 
+    // Validate cutoff
+    try {
+      const cutoffValidation = await base44.functions.invoke('validateCutoff', {});
+      if (!cutoffValidation.allowed) {
+        setCutoffError(cutoffValidation.message);
+        toast.error(cutoffValidation.message);
+        setSubmitting(false);
+        return;
+      }
+    } catch (error) {
+      console.error('Cutoff validation error:', error);
+      toast.error('Unable to validate subscription timing. Please try again.');
+      setSubmitting(false);
+      return;
+    }
+
     if (!formData.street || !formData.city || !formData.state || !formData.zip) {
       toast.error('Please fill in all delivery address fields');
       setSubmitting(false);
@@ -178,19 +196,16 @@ export default function SubscriptionCheckout() {
       return;
     }
 
-    const subscriptionData = {
+    // Create subscription draft first
+    const draftData = {
       user_email: user.email,
-      plan_type: plan.frequency,
+      plan_id: planId,
       plan_name: plan.name,
+      plan_type: plan.frequency,
       meals_per_week: plan.mealsPerWeek,
       price_per_delivery: plan.price,
-      discount_percentage: plan.savings,
-      status: 'pending',
-      meal_preferences: {
-        selected_meals: selectedMeals,
-        dietary_preferences: formData.dietaryPreferences,
-        excluded_ingredients: []
-      },
+      selected_meals: selectedMeals,
+      dietary_preferences: formData.dietaryPreferences,
       delivery_schedule: {
         delivery_day: formData.deliveryDay,
         time_slot: formData.timeSlot,
@@ -203,16 +218,50 @@ export default function SubscriptionCheckout() {
         zip: formData.zip,
         special_instructions: formData.specialInstructions
       },
-      billing_info: {
-        payment_method: 'stripe',
-        next_billing_date: calculateNextBillingDate(),
-        billing_cycle_count: 0
-      },
-      start_date: new Date().toISOString().split('T')[0],
-      discount_code: referralCode.toUpperCase() || null
+      referral_code: referralCode || null,
+      payment_method: paymentMethod,
+      status: 'pending'
     };
 
     try {
+      // Create draft
+      const draft = await base44.entities.SubscriptionDraft.create(draftData);
+
+      // Create pending subscription
+      const subscriptionData = {
+        user_email: user.email,
+        plan_type: plan.frequency,
+        plan_name: plan.name,
+        meals_per_week: plan.mealsPerWeek,
+        price_per_delivery: plan.price,
+        discount_percentage: plan.savings,
+        status: 'pending',
+        meal_preferences: {
+          selected_meals: selectedMeals,
+          dietary_preferences: formData.dietaryPreferences,
+          excluded_ingredients: []
+        },
+        delivery_schedule: {
+          delivery_day: formData.deliveryDay,
+          time_slot: formData.timeSlot,
+          next_delivery_date: calculateNextDeliveryDate()
+        },
+        delivery_address: {
+          street: formData.street,
+          city: formData.city,
+          state: formData.state,
+          zip: formData.zip,
+          special_instructions: formData.specialInstructions
+        },
+        billing_info: {
+          payment_method: paymentMethod,
+          next_billing_date: calculateNextBillingDate(),
+          billing_cycle_count: 0
+        },
+        start_date: new Date().toISOString().split('T')[0],
+        discount_code: referralCode || null
+      };
+
       const newSubscription = await base44.entities.Subscription.create(subscriptionData);
       
       // Handle referral reward after subscription creation
@@ -270,9 +319,11 @@ export default function SubscriptionCheckout() {
         subscriptionId: newSubscription.id,
         metadata: {
           subscription_id: newSubscription.id,
+          draft_id: draft.id,
           plan_name: plan.name,
           meals_per_week: plan.mealsPerWeek,
-          referral_code: referralCode || ''
+          referral_code: referralCode || '',
+          payment_method: paymentMethod
         }
       });
 
@@ -490,19 +541,29 @@ export default function SubscriptionCheckout() {
               </CardContent>
             </Card>
 
-            {/* Payment Info */}
+            {/* Payment Method Selection */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Lock className="w-5 h-5" />
-                  Secure Payment
+                  <CreditCard className="w-5 h-5" />
+                  Payment Method
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
+                  <div className="flex items-center space-x-3 p-4 border-2 rounded-lg cursor-pointer" onClick={() => setPaymentMethod('card')}>
+                    <RadioGroupItem value="card" id="card" />
+                    <Label htmlFor="card" className="flex-1 cursor-pointer font-semibold">Credit / Debit Card</Label>
+                  </div>
+                  <div className="flex items-center space-x-3 p-4 border-2 rounded-lg cursor-pointer" onClick={() => setPaymentMethod('paypal')}>
+                    <RadioGroupItem value="paypal" id="paypal" />
+                    <Label htmlFor="paypal" className="flex-1 cursor-pointer font-semibold">PayPal</Label>
+                  </div>
+                </RadioGroup>
+                
                 <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                   <p className="text-sm text-blue-900">
-                    You'll be redirected to Stripe's secure checkout to complete your payment. 
-                    Stripe accepts all major credit cards, debit cards, and digital wallets.
+                    You'll be redirected to Stripe's secure checkout to complete your payment.
                   </p>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-gray-500">
@@ -511,6 +572,15 @@ export default function SubscriptionCheckout() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Cutoff Warning */}
+            {cutoffError && (
+              <Card className="border-red-200 bg-red-50">
+                <CardContent className="p-4">
+                  <p className="text-sm text-red-800">{cutoffError}</p>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Order Summary */}

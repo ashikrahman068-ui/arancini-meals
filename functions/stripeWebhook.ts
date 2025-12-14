@@ -36,6 +36,7 @@ Deno.serve(async (req) => {
                 const session = event.data.object;
                 const orderId = session.metadata?.order_id;
                 const subscriptionId = session.metadata?.subscription_id;
+                const draftId = session.metadata?.draft_id;
 
                 // Update order status
                 if (orderId) {
@@ -45,7 +46,7 @@ Deno.serve(async (req) => {
                         payment_method: 'stripe'
                     });
 
-                    // Sync order to HubSpot as a deal
+                    // Sync order to HubSpot
                     try {
                         await base44.asServiceRole.functions.invoke('hubspotCreateDeal', {
                             order_id: order.id,
@@ -59,18 +60,39 @@ Deno.serve(async (req) => {
                     }
                 }
 
-                // Update subscription status and save Stripe IDs
-                if (subscriptionId) {
+                // Handle subscription completion
+                if (subscriptionId && session.subscription) {
+                    const stripeSubscription = await stripe.subscriptions.retrieve(session.subscription);
+                    
+                    // Get the subscription draft if exists
+                    let draftData = null;
+                    if (draftId) {
+                        try {
+                            const draft = await base44.asServiceRole.entities.SubscriptionDraft.get(draftId);
+                            draftData = draft;
+                            
+                            // Mark draft as completed
+                            await base44.asServiceRole.entities.SubscriptionDraft.update(draftId, {
+                                status: 'completed'
+                            });
+                        } catch (error) {
+                            console.error('Error fetching draft:', error);
+                        }
+                    }
+
+                    // Update subscription with Stripe data
                     const subscription = await base44.asServiceRole.entities.Subscription.get(subscriptionId);
                     
                     await base44.asServiceRole.entities.Subscription.update(subscriptionId, {
                         status: 'active',
-                        stripe_subscription_id: session.subscription || session.id,
+                        stripe_subscription_id: stripeSubscription.id,
                         stripe_customer_id: session.customer,
                         billing_info: {
                             ...subscription.billing_info,
-                            payment_method: 'stripe',
-                            last_payment_date: new Date().toISOString().split('T')[0],
+                            payment_method: session.payment_method_types?.[0] || 'stripe',
+                            last_payment_date: new Date(stripeSubscription.current_period_start * 1000).toISOString().split('T')[0],
+                            next_billing_date: new Date(stripeSubscription.current_period_end * 1000).toISOString().split('T')[0],
+                            billing_cycle_count: 1
                         }
                     });
 
@@ -81,16 +103,47 @@ Deno.serve(async (req) => {
 
             case 'customer.subscription.created': {
                 const subscription = event.data.object;
-                const subscriptionId = subscription.metadata?.subscription_id;
+                const draftId = subscription.metadata?.draft_id;
                 
-                if (subscriptionId) {
-                    await base44.asServiceRole.entities.Subscription.update(subscriptionId, {
-                        stripe_subscription_id: subscription.id,
-                        stripe_customer_id: subscription.customer,
-                        status: 'active'
+                // Find subscription by metadata
+                if (draftId) {
+                    const drafts = await base44.asServiceRole.entities.SubscriptionDraft.filter({
+                        id: draftId,
+                        status: 'pending'
                     });
                     
-                    console.log('Stripe subscription created and linked:', subscription.id);
+                    if (drafts.length > 0) {
+                        const draft = drafts[0];
+                        
+                        // Create subscription from draft
+                        await base44.asServiceRole.entities.Subscription.create({
+                            user_email: draft.user_email,
+                            plan_type: draft.plan_type,
+                            plan_name: draft.plan_name,
+                            meals_per_week: draft.meals_per_week,
+                            price_per_delivery: draft.price_per_delivery,
+                            status: 'active',
+                            stripe_subscription_id: subscription.id,
+                            stripe_customer_id: subscription.customer,
+                            meal_preferences: {
+                                selected_meals: draft.selected_meals,
+                                dietary_preferences: draft.dietary_preferences,
+                                excluded_ingredients: []
+                            },
+                            delivery_schedule: draft.delivery_schedule,
+                            delivery_address: draft.delivery_address,
+                            billing_info: {
+                                payment_method: draft.payment_method,
+                                last_payment_date: new Date(subscription.current_period_start * 1000).toISOString().split('T')[0],
+                                next_billing_date: new Date(subscription.current_period_end * 1000).toISOString().split('T')[0],
+                                billing_cycle_count: 1
+                            },
+                            start_date: new Date().toISOString().split('T')[0],
+                            discount_code: draft.referral_code
+                        });
+                        
+                        console.log('Subscription created from draft:', draftId);
+                    }
                 }
                 break;
             }
@@ -175,7 +228,7 @@ Deno.serve(async (req) => {
             case 'invoice.payment_failed': {
                 const invoice = event.data.object;
                 
-                // Find subscription and mark as having payment issues
+                // Find subscription and mark as payment_failed
                 if (invoice.subscription) {
                     const subscriptions = await base44.asServiceRole.entities.Subscription.filter({
                         stripe_subscription_id: invoice.subscription
@@ -183,12 +236,43 @@ Deno.serve(async (req) => {
                     
                     if (subscriptions.length > 0) {
                         await base44.asServiceRole.entities.Subscription.update(subscriptions[0].id, {
-                            notes: `Payment failed on ${new Date().toISOString().split('T')[0]}`
+                            status: 'payment_failed',
+                            notes: `Payment failed on ${new Date().toISOString().split('T')[0]}. Please update your payment method.`
                         });
                     }
                 }
                 
                 console.log('Invoice payment failed:', invoice.id);
+                break;
+            }
+
+            case 'customer.subscription.paused': {
+                const subscription = event.data.object;
+                
+                const subscriptions = await base44.asServiceRole.entities.Subscription.filter({
+                    stripe_subscription_id: subscription.id
+                });
+                
+                if (subscriptions.length > 0) {
+                    await base44.asServiceRole.entities.Subscription.update(subscriptions[0].id, {
+                        status: 'paused'
+                    });
+                }
+                break;
+            }
+
+            case 'customer.subscription.resumed': {
+                const subscription = event.data.object;
+                
+                const subscriptions = await base44.asServiceRole.entities.Subscription.filter({
+                    stripe_subscription_id: subscription.id
+                });
+                
+                if (subscriptions.length > 0) {
+                    await base44.asServiceRole.entities.Subscription.update(subscriptions[0].id, {
+                        status: 'active'
+                    });
+                }
                 break;
             }
 

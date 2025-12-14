@@ -50,23 +50,51 @@ Deno.serve(async (req) => {
             };
         });
 
-        // Create Stripe checkout session
-        const session = await stripe.checkout.sessions.create({
+        // Get or create Stripe customer
+        let customerId = user.stripe_customer_id;
+        if (!customerId) {
+            const customer = await stripe.customers.create({
+                email: user.email,
+                name: user.full_name,
+                metadata: {
+                    user_id: user.id,
+                    user_email: user.email
+                }
+            });
+            customerId = customer.id;
+            
+            // Save customer ID to user
+            await base44.auth.updateMe({
+                stripe_customer_id: customerId
+            });
+        }
+
+        // Prepare session config
+        const sessionConfig = {
             payment_method_types: ['card'],
             line_items: lineItems,
-            mode: mode || 'payment', // 'payment' for one-time, 'subscription' for recurring
+            mode: mode || 'payment',
             success_url: `${origin}/?page=paymentsuccess&session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${origin}/?page=paymentcancel`,
-            customer_email: user.email,
+            customer: customerId,
             client_reference_id: orderId || subscriptionId || user.id,
             metadata: {
                 user_id: user.id,
                 user_email: user.email,
                 order_id: orderId || '',
                 subscription_id: subscriptionId || '',
+                draft_id: metadata?.draft_id || '',
                 ...metadata
-            },
-        });
+            }
+        };
+
+        // Add PayPal for subscription mode
+        if (mode === 'subscription') {
+            sessionConfig.payment_method_types = ['card', 'paypal'];
+        }
+
+        // Create Stripe checkout session
+        const session = await stripe.checkout.sessions.create(sessionConfig);
 
         return Response.json({ 
             sessionId: session.id,
