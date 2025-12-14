@@ -226,6 +226,31 @@ export default function SubscriptionCheckout() {
     try {
       const newSubscription = await base44.entities.Subscription.create(subscriptionData);
       
+      // Handle referral reward after subscription creation
+      if (referralDiscount > 0 && referralCode) {
+        try {
+          const referrers = await base44.entities.User.filter({ referral_code: referralCode.toUpperCase() });
+          if (referrers.length > 0) {
+            const referrer = referrers[0];
+            
+            await base44.entities.Referral.create({
+              referrer_email: referrer.email,
+              referrer_code: referralCode.toUpperCase(),
+              referred_email: user.email,
+              status: 'pending',
+              reward_type: 'credit',
+              referrer_reward_amount: 20,
+              referred_reward_amount: 10,
+              subscription_id: newSubscription.id
+            });
+
+            await base44.auth.updateMe({ referred_by: referralCode.toUpperCase() });
+          }
+        } catch (error) {
+          console.error('Error processing referral:', error);
+        }
+      }
+
       // Create Stripe checkout for subscription
       const intervalMap = {
         'weekly': 'week',
@@ -264,31 +289,6 @@ export default function SubscriptionCheckout() {
 
       if (!checkoutResponse?.url) {
         throw new Error('Failed to create checkout session');
-      }
-
-      // Handle referral reward after checkout creation
-      if (referralDiscount > 0 && referralCode) {
-        try {
-          const referrers = await base44.entities.User.filter({ referral_code: referralCode.toUpperCase() });
-          if (referrers.length > 0) {
-            const referrer = referrers[0];
-            
-            await base44.entities.Referral.create({
-              referrer_email: referrer.email,
-              referrer_code: referralCode.toUpperCase(),
-              referred_email: user.email,
-              status: 'pending',
-              reward_type: 'credit',
-              referrer_reward_amount: 20,
-              referred_reward_amount: 10,
-              subscription_id: newSubscription.id
-            });
-
-            await base44.auth.updateMe({ referred_by: referralCode.toUpperCase() });
-          }
-        } catch (error) {
-          console.error('Error processing referral:', error);
-        }
       }
 
       // Redirect to Stripe checkout
