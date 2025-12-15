@@ -168,21 +168,7 @@ export default function SubscriptionCheckout() {
     e.preventDefault();
     setSubmitting(true);
 
-    // Validate cutoff
-    try {
-      const cutoffValidation = await base44.functions.invoke('validateCutoff', {});
-      if (!cutoffValidation.allowed) {
-        setCutoffError(cutoffValidation.message);
-        toast.error(cutoffValidation.message);
-        setSubmitting(false);
-        return;
-      }
-    } catch (error) {
-      console.error('Cutoff validation error:', error);
-      toast.error('Unable to validate subscription timing. Please try again.');
-      setSubmitting(false);
-      return;
-    }
+
 
     if (!formData.street || !formData.city || !formData.state || !formData.zip) {
       toast.error('Please fill in all delivery address fields');
@@ -196,51 +182,17 @@ export default function SubscriptionCheckout() {
       return;
     }
 
-    // Create subscription draft first
-    const draftData = {
-      user_email: user.email,
-      plan_id: planId,
-      plan_name: plan.name,
-      plan_type: plan.frequency,
-      meals_per_week: plan.mealsPerWeek,
-      price_per_delivery: plan.price,
-      selected_meals: selectedMeals,
-      dietary_preferences: formData.dietaryPreferences,
-      delivery_schedule: {
-        delivery_day: formData.deliveryDay,
-        time_slot: formData.timeSlot,
-        next_delivery_date: calculateNextDeliveryDate()
-      },
-      delivery_address: {
-        street: formData.street,
-        city: formData.city,
-        state: formData.state,
-        zip: formData.zip,
-        special_instructions: formData.specialInstructions
-      },
-      referral_code: referralCode || null,
-      payment_method: paymentMethod,
-      status: 'pending'
-    };
-
     try {
-      // Create draft
-      const draft = await base44.entities.SubscriptionDraft.create(draftData);
-
-      // Create pending subscription
-      const subscriptionData = {
-        user_email: user.email,
-        plan_type: plan.frequency,
+      // Create draft and subscription via backend
+      const { draft, subscription: newSubscription } = await base44.functions.invoke('createSubscriptionDraft', {
+        plan_id: planId,
         plan_name: plan.name,
+        plan_type: plan.frequency,
         meals_per_week: plan.mealsPerWeek,
         price_per_delivery: plan.price,
         discount_percentage: plan.savings,
-        status: 'pending',
-        meal_preferences: {
-          selected_meals: selectedMeals,
-          dietary_preferences: formData.dietaryPreferences,
-          excluded_ingredients: []
-        },
+        selected_meals: selectedMeals,
+        dietary_preferences: formData.dietaryPreferences,
         delivery_schedule: {
           delivery_day: formData.deliveryDay,
           time_slot: formData.timeSlot,
@@ -253,41 +205,12 @@ export default function SubscriptionCheckout() {
           zip: formData.zip,
           special_instructions: formData.specialInstructions
         },
-        billing_info: {
-          payment_method: paymentMethod,
-          next_billing_date: calculateNextBillingDate(),
-          billing_cycle_count: 0
-        },
-        start_date: new Date().toISOString().split('T')[0],
-        discount_code: referralCode || null
-      };
-
-      const newSubscription = await base44.entities.Subscription.create(subscriptionData);
+        referral_code: referralCode || null,
+        payment_method: paymentMethod,
+        next_billing_date: calculateNextBillingDate()
+      });
       
-      // Handle referral reward after subscription creation
-      if (referralDiscount > 0 && referralCode) {
-        try {
-          const referrers = await base44.entities.User.filter({ referral_code: referralCode.toUpperCase() });
-          if (referrers.length > 0) {
-            const referrer = referrers[0];
-            
-            await base44.entities.Referral.create({
-              referrer_email: referrer.email,
-              referrer_code: referralCode.toUpperCase(),
-              referred_email: user.email,
-              status: 'pending',
-              reward_type: 'credit',
-              referrer_reward_amount: 20,
-              referred_reward_amount: 10,
-              subscription_id: newSubscription.id
-            });
 
-            await base44.auth.updateMe({ referred_by: referralCode.toUpperCase() });
-          }
-        } catch (error) {
-          console.error('Error processing referral:', error);
-        }
-      }
 
       // Create Stripe checkout for subscription
       const intervalMap = {
@@ -335,7 +258,12 @@ export default function SubscriptionCheckout() {
       window.location.href = checkoutResponse.url;
     } catch (error) {
       console.error('Subscription creation error:', error);
-      toast.error('Failed to create subscription. Please try again.');
+      if (error.cutoffExceeded) {
+        setCutoffError(error.message);
+        toast.error(error.message);
+      } else {
+        toast.error('Failed to create subscription. Please try again.');
+      }
       setSubmitting(false);
     }
   };

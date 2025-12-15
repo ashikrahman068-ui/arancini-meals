@@ -65,12 +65,11 @@ export default function Account() {
   const loadSubscriptions = async () => {
     setLoadingSubscriptions(true);
     try {
-      const subs = await base44.entities.Subscription.filter({
-        user_email: user.email
-      });
+      const { subscriptions: subs } = await base44.functions.invoke('getMySubscriptions', {});
       setSubscriptions(subs);
     } catch (error) {
       console.error('Error loading subscriptions:', error);
+      toast.error('Failed to load subscriptions');
     } finally {
       setLoadingSubscriptions(false);
     }
