@@ -57,22 +57,20 @@ export default function ManageSubscription() {
   const fetchSubscription = async () => {
     try {
       const user = await base44.auth.me();
-      const subscriptions = await base44.entities.Subscription.filter({
-        user_email: user.email,
-        status: 'active'
-      });
+      const { subscriptions } = await base44.functions.invoke('getMySubscriptions', {});
+      const activeSubscriptions = subscriptions.filter(s => s.status === 'active');
 
-      if (subscriptions.length === 0) {
+      if (activeSubscriptions.length === 0) {
         toast.info('No active subscription found');
         navigate(createPageUrl('Subscriptions'));
         return;
       }
 
-      setSubscription(subscriptions[0]);
+      setSubscription(activeSubscriptions[0]);
 
-      if (subscriptions[0].meal_preferences?.selected_meals) {
+      if (activeSubscriptions[0].meal_preferences?.selected_meals) {
         const allMeals = await base44.entities.Meal.list();
-        const selectedMeals = subscriptions[0].meal_preferences.selected_meals
+        const selectedMeals = activeSubscriptions[0].meal_preferences.selected_meals
           .map(id => allMeals.find(m => m.id === id))
           .filter(Boolean);
         setMeals(selectedMeals);
@@ -89,11 +87,18 @@ export default function ManageSubscription() {
   const handlePauseSubscription = async () => {
     setUpdating(true);
     try {
-      await base44.entities.Subscription.update(subscription.id, { status: 'paused' });
+      await base44.functions.invoke('updateSubscription', {
+        subscriptionId: subscription.id,
+        action: 'pause'
+      });
       toast.success('Subscription paused successfully');
       fetchSubscription();
     } catch (error) {
-      toast.error('Failed to pause subscription');
+      if (error.cutoffExceeded) {
+        toast.error('Changes are not allowed after Saturday 11:59 PM');
+      } else {
+        toast.error('Failed to pause subscription');
+      }
     } finally {
       setUpdating(false);
     }
@@ -102,11 +107,18 @@ export default function ManageSubscription() {
   const handleResumeSubscription = async () => {
     setUpdating(true);
     try {
-      await base44.entities.Subscription.update(subscription.id, { status: 'active' });
+      await base44.functions.invoke('updateSubscription', {
+        subscriptionId: subscription.id,
+        action: 'resume'
+      });
       toast.success('Subscription resumed successfully');
       fetchSubscription();
     } catch (error) {
-      toast.error('Failed to resume subscription');
+      if (error.cutoffExceeded) {
+        toast.error('Changes are not allowed after Saturday 11:59 PM');
+      } else {
+        toast.error('Failed to resume subscription');
+      }
     } finally {
       setUpdating(false);
     }
@@ -115,7 +127,10 @@ export default function ManageSubscription() {
   const handleCancelSubscription = async () => {
     setUpdating(true);
     try {
-      await base44.entities.Subscription.update(subscription.id, { status: 'cancelled' });
+      await base44.functions.invoke('updateSubscription', {
+        subscriptionId: subscription.id,
+        action: 'cancel'
+      });
       toast.success('Subscription cancelled successfully');
       navigate(createPageUrl('Subscriptions'));
     } catch (error) {
@@ -152,16 +167,19 @@ export default function ManageSubscription() {
   const handleChangeDeliveryDay = async (newDay) => {
     setUpdating(true);
     try {
-      await base44.entities.Subscription.update(subscription.id, {
-        delivery_schedule: {
-          ...subscription.delivery_schedule,
-          delivery_day: newDay
-        }
+      await base44.functions.invoke('updateSubscription', {
+        subscriptionId: subscription.id,
+        action: 'update_schedule',
+        data: { delivery_day: newDay }
       });
       toast.success('Delivery day updated successfully');
       fetchSubscription();
     } catch (error) {
-      toast.error('Failed to update delivery day');
+      if (error.cutoffExceeded) {
+        toast.error('Changes are not allowed after Saturday 11:59 PM');
+      } else {
+        toast.error('Failed to update delivery day');
+      }
     } finally {
       setUpdating(false);
     }
@@ -170,16 +188,19 @@ export default function ManageSubscription() {
   const handleChangeTimeSlot = async (newSlot) => {
     setUpdating(true);
     try {
-      await base44.entities.Subscription.update(subscription.id, {
-        delivery_schedule: {
-          ...subscription.delivery_schedule,
-          time_slot: newSlot
-        }
+      await base44.functions.invoke('updateSubscription', {
+        subscriptionId: subscription.id,
+        action: 'update_schedule',
+        data: { time_slot: newSlot }
       });
       toast.success('Time slot updated successfully');
       fetchSubscription();
     } catch (error) {
-      toast.error('Failed to update time slot');
+      if (error.cutoffExceeded) {
+        toast.error('Changes are not allowed after Saturday 11:59 PM');
+      } else {
+        toast.error('Failed to update time slot');
+      }
     } finally {
       setUpdating(false);
     }

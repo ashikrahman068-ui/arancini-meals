@@ -41,16 +41,21 @@ export default function SubscriptionManagement({ subscription, onUpdate }) {
           break;
       }
 
-      await base44.entities.Subscription.update(subscription.id, {
-        status: 'paused',
-        notes: `Paused until ${pauseUntil.toISOString()}`
+      await base44.functions.invoke('updateSubscription', {
+        subscriptionId: subscription.id,
+        action: 'pause',
+        data: { pauseUntil: pauseUntil.toISOString() }
       });
 
       toast.success('Subscription paused successfully');
       setShowPauseDialog(false);
       if (onUpdate) onUpdate();
     } catch (error) {
-      toast.error('Failed to pause subscription');
+      if (error.cutoffExceeded) {
+        toast.error('Changes are not allowed after Saturday 11:59 PM');
+      } else {
+        toast.error('Failed to pause subscription');
+      }
     } finally {
       setIsProcessing(false);
     }
@@ -59,15 +64,19 @@ export default function SubscriptionManagement({ subscription, onUpdate }) {
   const handleResume = async () => {
     setIsProcessing(true);
     try {
-      await base44.entities.Subscription.update(subscription.id, {
-        status: 'active',
-        notes: 'Resumed by user'
+      await base44.functions.invoke('updateSubscription', {
+        subscriptionId: subscription.id,
+        action: 'resume'
       });
 
       toast.success('Subscription resumed successfully');
       if (onUpdate) onUpdate();
     } catch (error) {
-      toast.error('Failed to resume subscription');
+      if (error.cutoffExceeded) {
+        toast.error('Changes are not allowed after Saturday 11:59 PM');
+      } else {
+        toast.error('Failed to resume subscription');
+      }
     } finally {
       setIsProcessing(false);
     }
@@ -81,9 +90,13 @@ export default function SubscriptionManagement({ subscription, onUpdate }) {
 
     setIsProcessing(true);
     try {
-      await base44.entities.Subscription.update(subscription.id, {
-        status: 'cancelled',
-        notes: `Cancelled. Reason: ${cancelReason}. Feedback: ${cancelFeedback}`
+      await base44.functions.invoke('updateSubscription', {
+        subscriptionId: subscription.id,
+        action: 'cancel',
+        data: { 
+          reason: cancelReason,
+          feedback: cancelFeedback
+        }
       });
 
       toast.success('Subscription cancelled successfully');
