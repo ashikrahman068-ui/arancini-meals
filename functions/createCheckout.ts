@@ -93,11 +93,6 @@ Deno.serve(async (req) => {
             }
         };
 
-        // Add PayPal for subscription mode
-        if (mode === 'subscription') {
-            sessionConfig.payment_method_types = ['card', 'paypal'];
-        }
-
         // Create Stripe checkout session
         const session = await stripe.checkout.sessions.create(sessionConfig);
 

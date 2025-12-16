@@ -258,11 +258,13 @@ export default function SubscriptionCheckout() {
       window.location.href = checkoutResponse.url;
     } catch (error) {
       console.error('Subscription creation error:', error);
+      console.error('Full error details:', error.response?.data || error);
       if (error.cutoffExceeded) {
         setCutoffError(error.message);
         toast.error(error.message);
       } else {
-        toast.error('Failed to create subscription. Please try again.');
+        const errorMsg = error.response?.data?.error || error.message || 'Failed to create subscription';
+        toast.error(errorMsg);
       }
       setSubmitting(false);
     }
