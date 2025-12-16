@@ -65,11 +65,12 @@ export default function Account() {
   const loadSubscriptions = async () => {
     setLoadingSubscriptions(true);
     try {
-      const { subscriptions: subs } = await base44.functions.invoke('getMySubscriptions', {});
-      setSubscriptions(subs);
+      const response = await base44.functions.invoke('getMySubscriptions', {});
+      setSubscriptions(response?.subscriptions || []);
     } catch (error) {
       console.error('Error loading subscriptions:', error);
       toast.error('Failed to load subscriptions');
+      setSubscriptions([]);
     } finally {
       setLoadingSubscriptions(false);
     }
