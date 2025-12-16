@@ -168,7 +168,12 @@ export default function SubscriptionCheckout() {
     e.preventDefault();
     setSubmitting(true);
 
-
+    // Validate PayPal is not supported
+    if (paymentMethod === 'paypal') {
+      toast.error('PayPal is not available yet. Please use a credit or debit card.');
+      setSubmitting(false);
+      return;
+    }
 
     if (!formData.street || !formData.city || !formData.state || !formData.zip) {
       toast.error('Please fill in all delivery address fields');
@@ -485,9 +490,11 @@ export default function SubscriptionCheckout() {
                     <RadioGroupItem value="card" id="card" />
                     <Label htmlFor="card" className="flex-1 cursor-pointer font-semibold">Credit / Debit Card</Label>
                   </div>
-                  <div className="flex items-center space-x-3 p-4 border-2 rounded-lg cursor-pointer" onClick={() => setPaymentMethod('paypal')}>
-                    <RadioGroupItem value="paypal" id="paypal" />
-                    <Label htmlFor="paypal" className="flex-1 cursor-pointer font-semibold">PayPal</Label>
+                  <div className="flex items-center space-x-3 p-4 border-2 rounded-lg cursor-not-allowed opacity-50" title="Coming soon">
+                    <RadioGroupItem value="paypal" id="paypal" disabled />
+                    <Label htmlFor="paypal" className="flex-1 font-semibold text-gray-400">
+                      PayPal <Badge variant="secondary" className="ml-2">Coming Soon</Badge>
+                    </Label>
                   </div>
                 </RadioGroup>
                 
