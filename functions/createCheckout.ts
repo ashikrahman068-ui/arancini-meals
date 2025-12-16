@@ -29,9 +29,14 @@ Deno.serve(async (req) => {
                 description: item.description || '',
             };
             
-            // Only add images if URL is valid (starts with http:// or https://)
-            if (item.image_url && (item.image_url.startsWith('http://') || item.image_url.startsWith('https://'))) {
-                productData.images = [item.image_url];
+            // Only add images for payment mode with valid HTTPS URLs
+            // Subscription mode: skip images to avoid Stripe validation issues
+            if (mode !== 'subscription' && item.image_url) {
+                const url = item.image_url.trim();
+                // Strict validation: must be HTTPS, not blob/data URLs, not relative paths
+                if (url.startsWith('https://') && !url.startsWith('https://blob:') && !url.includes('data:image')) {
+                    productData.images = [url];
+                }
             }
             
             return {
@@ -103,8 +108,10 @@ Deno.serve(async (req) => {
 
     } catch (error) {
         console.error('Checkout error:', error);
+        console.error('Stripe error details:', error.raw || error);
         return Response.json({ 
-            error: error.message 
+            error: error.message || 'Failed to create checkout session',
+            details: error.raw?.message || error.toString()
         }, { status: 500 });
     }
 });
