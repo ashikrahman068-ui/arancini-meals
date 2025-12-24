@@ -223,9 +223,9 @@ export default function SubscriptionCheckout() {
       }
       
       // Access nested result from base44.functions.invoke
-      const draft = draftResponse?.draft;
-      const newSubscription = draftResponse?.subscription;
-      
+      const draft = draftResponse?.result?.draft;
+      const newSubscription = draftResponse?.result?.subscription;
+
       if (!draft?.id || !newSubscription?.id) {
         console.error('Invalid subscription response:', draftResponse);
         throw new Error('Invalid response: missing subscription data');
