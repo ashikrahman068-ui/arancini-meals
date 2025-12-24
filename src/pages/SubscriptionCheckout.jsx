@@ -189,7 +189,7 @@ export default function SubscriptionCheckout() {
 
     try {
       // Create draft and subscription via backend
-      const { draft, subscription: newSubscription } = await base44.functions.invoke('createSubscriptionDraft', {
+      const draftResponse = await base44.functions.invoke('createSubscriptionDraft', {
         plan_id: planId,
         plan_name: plan.name,
         plan_type: plan.frequency,
@@ -214,6 +214,14 @@ export default function SubscriptionCheckout() {
         payment_method: paymentMethod,
         next_billing_date: calculateNextBillingDate()
       });
+
+      console.log('Draft response:', draftResponse);
+      
+      if (!draftResponse?.draft || !draftResponse?.subscription) {
+        throw new Error('Invalid response from subscription creation');
+      }
+
+      const { draft, subscription: newSubscription } = draftResponse;
       
 
 
