@@ -93,6 +93,21 @@ Deno.serve(async (req) => {
             }
         };
 
+        // Validate required fields before creating session
+        if (!sessionConfig.success_url || !sessionConfig.cancel_url) {
+            console.error('Missing required URLs');
+            return Response.json({ 
+                error: 'Invalid checkout configuration: missing success/cancel URLs' 
+            }, { status: 400 });
+        }
+
+        if (!sessionConfig.mode) {
+            console.error('Missing checkout mode');
+            return Response.json({ 
+                error: 'Invalid checkout configuration: missing mode' 
+            }, { status: 400 });
+        }
+
         // Create Stripe checkout session
         const session = await stripe.checkout.sessions.create(sessionConfig);
 
@@ -102,11 +117,26 @@ Deno.serve(async (req) => {
         });
 
     } catch (error) {
-        console.error('Checkout error:', error);
-        console.error('Stripe error details:', error.raw || error);
+        console.error('=== CHECKOUT ERROR ===');
+        console.error('Error message:', error.message);
+        console.error('Error type:', error.type);
+        console.error('Error code:', error.code);
+        console.error('Full error:', JSON.stringify(error, null, 2));
+        
+        // Extract meaningful error message
+        const errorMessage = error.raw?.message || error.message || 'Failed to create checkout session';
+        const errorDetails = {
+            message: errorMessage,
+            type: error.type,
+            code: error.code,
+            param: error.param
+        };
+        
+        console.error('Returning error:', errorDetails);
+        
         return Response.json({ 
-            error: error.message || 'Failed to create checkout session',
-            details: error.raw?.message || error.toString()
+            error: errorMessage,
+            details: errorDetails
         }, { status: 500 });
     }
 });

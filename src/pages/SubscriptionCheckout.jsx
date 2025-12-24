@@ -252,6 +252,12 @@ export default function SubscriptionCheckout() {
         }
       }];
 
+      console.log('Creating checkout with:', {
+        items: checkoutItems,
+        mode: 'subscription',
+        subscriptionId: newSubscription.id
+      });
+
       const checkoutResponse = await base44.functions.invoke('createCheckout', {
         items: checkoutItems,
         mode: 'subscription',
@@ -266,21 +272,39 @@ export default function SubscriptionCheckout() {
         }
       });
 
+      console.log('Checkout response:', checkoutResponse);
+
       if (!checkoutResponse?.url) {
-        throw new Error('Failed to create checkout session');
+        const errorMsg = checkoutResponse?.error || 'Failed to create checkout session';
+        console.error('Checkout failed:', checkoutResponse);
+        throw new Error(errorMsg);
       }
 
       // Redirect to Stripe checkout
       window.location.href = checkoutResponse.url;
     } catch (error) {
-      console.error('Subscription creation error:', error);
-      console.error('Full error details:', error.response?.data || error);
+      console.error('=== SUBSCRIPTION ERROR ===');
+      console.error('Error object:', error);
+      console.error('Error message:', error.message);
+      console.error('Error details:', error.details);
+      
       if (error.cutoffExceeded) {
         setCutoffError(error.message);
         toast.error(error.message);
       } else {
-        const errorMsg = error.response?.data?.error || error.message || 'Failed to create subscription';
-        toast.error(errorMsg);
+        // Extract the most specific error message
+        let errorMsg = 'Failed to create subscription. Please try again.';
+        
+        if (error.details?.message) {
+          errorMsg = error.details.message;
+        } else if (error.message) {
+          errorMsg = error.message;
+        } else if (error.error) {
+          errorMsg = error.error;
+        }
+        
+        console.error('Showing error to user:', errorMsg);
+        toast.error(errorMsg, { duration: 5000 });
       }
       setSubmitting(false);
     }
