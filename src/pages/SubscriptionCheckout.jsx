@@ -217,11 +217,14 @@ export default function SubscriptionCheckout() {
 
       console.log('Draft response:', draftResponse);
       
-      if (!draftResponse?.draft || !draftResponse?.subscription) {
-        throw new Error('Invalid response from subscription creation');
+      // Access nested result from base44.functions.invoke
+      const draft = draftResponse?.draft;
+      const newSubscription = draftResponse?.subscription;
+      
+      if (!draft?.id || !newSubscription?.id) {
+        console.error('Invalid subscription response:', draftResponse);
+        throw new Error('Failed to create subscription. Please try again.');
       }
-
-      const { draft, subscription: newSubscription } = draftResponse;
       
 
 
