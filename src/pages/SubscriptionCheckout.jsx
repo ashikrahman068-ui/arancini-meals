@@ -295,21 +295,25 @@ if (!checkoutUrl) {
       // Redirect to Stripe checkout
       window.location.href = checkoutUrl;
     } catch (error) {
-      console.error('=== SUBSCRIPTION ERROR ===');
-      console.error('Error type:', typeof error);
-      console.error('Error:', error);
-      
-      if (error.cutoffExceeded) {
-        setCutoffError(error.message);
-        toast.error(error.message);
-      } else {
-        // Display the actual error message
-        const errorMsg = error.message || error.error || error.toString() || 'Failed to create subscription';
-        console.error('Displaying error:', errorMsg);
-        toast.error(errorMsg, { duration: 5000 });
-      }
-      setSubmitting(false);
-    }
+  console.error('=== SUBSCRIPTION ERROR ===');
+  console.error(error);
+
+  let message = 'Unknown error';
+
+  if (typeof error === 'string') {
+    message = error;
+  } else if (error?.message) {
+    message = error.message;
+  } else if (error?.error) {
+    message = error.error;
+  } else if (error?.result?.error) {
+    message = error.result.error;
+  }
+
+  toast.error(message, { duration: 6000 });
+  setSubmitting(false);
+}
+
   };
 
   if (!plan) {
