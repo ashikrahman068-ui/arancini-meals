@@ -217,13 +217,18 @@ export default function SubscriptionCheckout() {
 
       console.log('Draft response:', draftResponse);
       
+      // Check for error in response
+      if (draftResponse?.error) {
+        throw new Error(draftResponse.error);
+      }
+      
       // Access nested result from base44.functions.invoke
       const draft = draftResponse?.draft;
       const newSubscription = draftResponse?.subscription;
       
       if (!draft?.id || !newSubscription?.id) {
         console.error('Invalid subscription response:', draftResponse);
-        throw new Error('Failed to create subscription. Please try again.');
+        throw new Error('Invalid response: missing subscription data');
       }
       
 
@@ -274,36 +279,31 @@ export default function SubscriptionCheckout() {
 
       console.log('Checkout response:', checkoutResponse);
 
+      // Check for error in checkout response
+      if (checkoutResponse?.error) {
+        console.error('Checkout error:', checkoutResponse);
+        throw new Error(checkoutResponse.error);
+      }
+
       if (!checkoutResponse?.url) {
-        const errorMsg = checkoutResponse?.error || 'Failed to create checkout session';
-        console.error('Checkout failed:', checkoutResponse);
-        throw new Error(errorMsg);
+        console.error('No checkout URL:', checkoutResponse);
+        throw new Error('Failed to get checkout URL');
       }
 
       // Redirect to Stripe checkout
       window.location.href = checkoutResponse.url;
     } catch (error) {
       console.error('=== SUBSCRIPTION ERROR ===');
-      console.error('Error object:', error);
-      console.error('Error message:', error.message);
-      console.error('Error details:', error.details);
+      console.error('Error type:', typeof error);
+      console.error('Error:', error);
       
       if (error.cutoffExceeded) {
         setCutoffError(error.message);
         toast.error(error.message);
       } else {
-        // Extract the most specific error message
-        let errorMsg = 'Failed to create subscription. Please try again.';
-        
-        if (error.details?.message) {
-          errorMsg = error.details.message;
-        } else if (error.message) {
-          errorMsg = error.message;
-        } else if (error.error) {
-          errorMsg = error.error;
-        }
-        
-        console.error('Showing error to user:', errorMsg);
+        // Display the actual error message
+        const errorMsg = error.message || error.error || error.toString() || 'Failed to create subscription';
+        console.error('Displaying error:', errorMsg);
         toast.error(errorMsg, { duration: 5000 });
       }
       setSubmitting(false);
