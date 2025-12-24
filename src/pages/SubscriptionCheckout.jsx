@@ -223,8 +223,14 @@ export default function SubscriptionCheckout() {
       }
       
       // Access nested result from base44.functions.invoke
-      const draft = draftResponse?.result?.draft;
-      const newSubscription = draftResponse?.result?.subscription;
+      const payload =
+        draftResponse?.data ||
+        draftResponse?.result ||
+        draftResponse;
+
+      const draft = payload?.draft;
+      const newSubscription = payload?.subscription;
+
 
       if (!draft?.id || !newSubscription?.id) {
         console.error('Invalid subscription response:', draftResponse);
