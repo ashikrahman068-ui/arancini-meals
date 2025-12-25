@@ -41,7 +41,7 @@ Deno.serve(async (req) => {
             
             return {
                 price_data: {
-                    currency: 'usd',
+                    currency: 'aud',
                     product_data: productData,
                     unit_amount: Math.round(item.price * 100), // Convert to cents
                     ...(mode === 'subscription' && item.recurring && {

@@ -582,26 +582,26 @@ export default function SubscriptionCheckout() {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span>{plan.mealsPerWeek} meals</span>
-                    <span>${plan.price.toFixed(2)}</span>
+                    <span>A${plan.price.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-green-600 font-semibold">
                     <span>Meal discount ({plan.savings}%)</span>
-                    <span>-${mealDiscountAmount.toFixed(2)}</span>
+                    <span>-A${mealDiscountAmount.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Delivery fee</span>
-                    <span>${plan.deliveryFee.toFixed(2)}</span>
+                    <span>A${plan.deliveryFee.toFixed(2)}</span>
                   </div>
                   {plan.frequency === 'monthly' && (
                     <div className="flex justify-between text-blue-600 font-semibold">
                       <span>Monthly delivery savings</span>
-                      <span>-${monthlyDeliveryDiscount.toFixed(2)}</span>
+                      <span>-A${monthlyDeliveryDiscount.toFixed(2)}</span>
                     </div>
                   )}
                   {referralDiscount > 0 && (
                     <div className="flex justify-between text-purple-600 font-semibold">
                       <span>Referral discount</span>
-                      <span>-${referralDiscount.toFixed(2)}</span>
+                      <span>-A${referralDiscount.toFixed(2)}</span>
                     </div>
                   )}
                 </div>
@@ -610,7 +610,7 @@ export default function SubscriptionCheckout() {
 
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>
-                  <span>${currentTotal.toFixed(2)}</span>
+                  <span>A${currentTotal.toFixed(2)}</span>
                 </div>
 
                 <div className="text-xs text-gray-500 space-y-1">

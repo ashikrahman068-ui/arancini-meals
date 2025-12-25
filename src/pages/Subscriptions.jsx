@@ -257,13 +257,13 @@ export default function Subscriptions() {
                 <CardDescription>{plan.description}</CardDescription>
                 <div className="mt-4">
                   <div className="text-4xl font-bold text-gray-900">
-                    ${plan.pricePerDelivery}
+                    A${plan.pricePerDelivery}
                   </div>
                   <div className="text-sm text-gray-500 capitalize">
                     per {plan.frequency === 'bi-weekly' ? '2 weeks' : plan.frequency}
                   </div>
                   <div className="text-xs text-gray-500 mt-1">
-                    + ${plan.deliveryFee} delivery
+                    + A${plan.deliveryFee} delivery
                   </div>
                   <Badge className="mt-2 bg-orange-100 text-orange-700">
                     Save {plan.savingsPercent}%
@@ -321,11 +321,11 @@ export default function Subscriptions() {
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Weekly delivery fee</span>
-                      <span className="font-semibold">$10</span>
+                      <span className="font-semibold">A$10</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Monthly total (4 weeks)</span>
-                      <span className="font-semibold text-red-600">$40</span>
+                      <span className="font-semibold text-red-600">A$40</span>
                     </div>
                   </div>
                 </div>
@@ -337,11 +337,11 @@ export default function Subscriptions() {
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Monthly delivery fee</span>
-                      <span className="font-semibold text-green-600">$20</span>
+                      <span className="font-semibold text-green-600">A$20</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">You save</span>
-                      <span className="font-semibold text-green-600">$20/month</span>
+                      <span className="font-semibold text-green-600">A$20/month</span>
                     </div>
                   </div>
                 </div>
