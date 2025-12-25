@@ -216,25 +216,29 @@ export default function SubscriptionCheckout() {
       });
 
       console.log('Draft response:', draftResponse);
+      console.log('Draft response keys:', Object.keys(draftResponse || {}));
       
       // Check for error in response
-      if (draftResponse?.error) {
-        throw new Error(draftResponse.error);
+      if (draftResponse?.error || draftResponse?.result?.error) {
+        throw new Error(draftResponse.error || draftResponse.result.error);
       }
       
       // Access nested result from base44.functions.invoke
-      const payload =
-        draftResponse?.data ||
-        draftResponse?.result ||
-        draftResponse;
+      // Try different possible response structures
+      const payload = draftResponse?.result || draftResponse;
+      
+      console.log('Payload:', payload);
+      console.log('Payload keys:', Object.keys(payload || {}));
 
       const draft = payload?.draft;
       const newSubscription = payload?.subscription;
 
+      console.log('Draft ID:', draft?.id);
+      console.log('Subscription ID:', newSubscription?.id);
 
       if (!draft?.id || !newSubscription?.id) {
-        console.error('Invalid subscription response:', draftResponse);
-        throw new Error('Invalid response: missing subscription data');
+        console.error('Missing IDs - Draft:', draft, 'Subscription:', newSubscription);
+        throw new Error('Server returned incomplete subscription data');
       }
       
 
