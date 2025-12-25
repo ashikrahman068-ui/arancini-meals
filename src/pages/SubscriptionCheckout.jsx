@@ -215,30 +215,20 @@ export default function SubscriptionCheckout() {
         next_billing_date: calculateNextBillingDate()
       });
 
-      console.log('Draft response:', draftResponse);
-      console.log('Draft response keys:', Object.keys(draftResponse || {}));
-      
-      // Check for error in response
-      if (draftResponse?.error || draftResponse?.result?.error) {
-        throw new Error(draftResponse.error || draftResponse.result.error);
-      }
-      
-      // Access nested result from base44.functions.invoke
-      // Try different possible response structures
-      const payload = draftResponse?.result || draftResponse;
-      
-      console.log('Payload:', payload);
-      console.log('Payload keys:', Object.keys(payload || {}));
+      console.log('RAW createSubscriptionDraft response:', draftResponse);
+
+      const payload =
+        draftResponse?.output ||
+        draftResponse?.data ||
+        draftResponse?.result ||
+        draftResponse;
 
       const draft = payload?.draft;
       const newSubscription = payload?.subscription;
 
-      console.log('Draft ID:', draft?.id);
-      console.log('Subscription ID:', newSubscription?.id);
-
-      if (!draft?.id || !newSubscription?.id) {
-        console.error('Missing IDs - Draft:', draft, 'Subscription:', newSubscription);
-        throw new Error('Server returned incomplete subscription data');
+      if (!draft || !newSubscription) {
+        console.error('Missing draft or subscription:', payload);
+        throw new Error('Subscription service failed to return data');
       }
       
 
