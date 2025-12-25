@@ -1,32 +1,36 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
+import { Base44 } from 'npm:@base44/sdk@0.8.4';
 import Stripe from 'npm:stripe@14.11.0';
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY"));
 const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
 
 Deno.serve(async (req) => {
-    try {
-        const base44 = createClientFromRequest(req);
-        const signature = req.headers.get('stripe-signature');
-        
-        if (!signature) {
-            return Response.json({ error: 'No signature provided' }, { status: 400 });
-        }
+    const signature = req.headers.get('stripe-signature');
+    
+    if (!signature) {
+        return Response.json({ error: 'No signature provided' }, { status: 400 });
+    }
 
-        const body = await req.text();
-        
-        // Verify webhook signature
-        let event;
-        try {
-            event = await stripe.webhooks.constructEventAsync(
-                body,
-                signature,
-                webhookSecret
-            );
-        } catch (err) {
-            console.error('Webhook signature verification failed:', err.message);
-            return Response.json({ error: 'Invalid signature' }, { status: 400 });
-        }
+    const body = await req.text();
+    
+    // Verify webhook signature FIRST (before any Base44 operations)
+    let event;
+    try {
+        event = await stripe.webhooks.constructEventAsync(
+            body,
+            signature,
+            webhookSecret
+        );
+    } catch (err) {
+        console.error('Webhook signature verification failed:', err.message);
+        return Response.json({ error: 'Invalid signature' }, { status: 400 });
+    }
+
+    // Now create Base44 client for service role operations
+    try {
+        const base44 = new Base44({
+            appId: Deno.env.get("BASE44_APP_ID")
+        });
 
         console.log('Webhook event type:', event.type);
 
