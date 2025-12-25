@@ -285,12 +285,16 @@ export default function SubscriptionCheckout() {
         throw new Error(checkoutResponse.error);
       }
 
-      const checkoutUrl = checkoutResponse?.result?.url;
+      const checkoutUrl = 
+        checkoutResponse?.output?.url ||
+        checkoutResponse?.data?.url ||
+        checkoutResponse?.result?.url ||
+        checkoutResponse?.url;
 
-if (!checkoutUrl) {
-  console.error('No checkout URL:', checkoutResponse);
-  throw new Error('Stripe checkout URL was not returned');
-}
+      if (!checkoutUrl) {
+        console.error('No checkout URL:', checkoutResponse);
+        throw new Error('Stripe checkout URL was not returned');
+      }
 
       // Redirect to Stripe checkout
       window.location.href = checkoutUrl;
