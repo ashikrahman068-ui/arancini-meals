@@ -3,19 +3,39 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, ArrowRight, Package, Receipt } from 'lucide-react';
+import { CheckCircle, ArrowRight, Package, Receipt, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { base44 } from '@/api/base44Client';
+import { toast } from 'sonner';
 
 export default function PaymentSuccess() {
   const navigate = useNavigate();
   const [sessionId, setSessionId] = useState(null);
+  const [processing, setProcessing] = useState(true);
 
   useEffect(() => {
     // Get session ID from URL
     const urlParams = new URLSearchParams(window.location.search);
     const sid = urlParams.get('session_id');
     setSessionId(sid);
+    
+    if (sid) {
+      verifyPayment(sid);
+    } else {
+      setProcessing(false);
+    }
   }, []);
+
+  const verifyPayment = async (sessionId) => {
+    try {
+      // Call backend to verify and activate subscription if needed
+      await base44.functions.invoke('verifyStripeSession', { sessionId });
+      setProcessing(false);
+    } catch (error) {
+      console.error('Payment verification error:', error);
+      setProcessing(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white py-12">
