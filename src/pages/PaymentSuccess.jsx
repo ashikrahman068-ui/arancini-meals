@@ -37,6 +37,20 @@ export default function PaymentSuccess() {
     }
   };
 
+  if (processing) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-green-50 to-white py-12 flex items-center justify-center">
+        <Card className="shadow-2xl border-0">
+          <CardContent className="p-12 text-center">
+            <Loader2 className="w-12 h-12 animate-spin text-green-600 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">Processing Your Payment</h2>
+            <p className="text-gray-600">Please wait while we confirm your subscription...</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white py-12">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
