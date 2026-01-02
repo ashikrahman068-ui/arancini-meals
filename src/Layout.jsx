@@ -40,14 +40,28 @@ function LayoutContent({ children, currentPageName }) {
   React.useEffect(() => {
     // Sync new user to HubSpot after authentication
     const syncNewUser = async () => {
-      if (isAuthenticated && sessionStorage.getItem('new_signup') === 'true') {
-        sessionStorage.removeItem('new_signup');
+      if (isAuthenticated) {
         try {
           const user = await base44.auth.me();
-          await base44.functions.invoke('hubspotSyncContact', {
-            email: user.email,
-            full_name: user.full_name
-          });
+          
+          // Check if user was created recently (within last 5 minutes = new signup)
+          const createdDate = new Date(user.created_date);
+          const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+          const isNewUser = createdDate > fiveMinutesAgo;
+          
+          // Also check sessionStorage flag for explicit new signup
+          const explicitNewSignup = sessionStorage.getItem('new_signup') === 'true';
+          
+          if (isNewUser || explicitNewSignup) {
+            sessionStorage.removeItem('new_signup');
+            
+            await base44.functions.invoke('hubspotSyncContact', {
+              email: user.email,
+              full_name: user.full_name
+            });
+            
+            console.log('New user synced to HubSpot:', user.email);
+          }
         } catch (error) {
           console.error('Failed to sync to HubSpot:', error);
         }
