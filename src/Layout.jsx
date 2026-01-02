@@ -104,6 +104,11 @@ function LayoutContent({ children, currentPageName }) {
       url: createPageUrl("ManageBlog"),
       icon: Receipt
     });
+    navigationItems.push({
+      name: "Admin Data",
+      url: createPageUrl("AdminData"),
+      icon: Receipt
+    });
   }
 
   const isActiveRoute = (url) => location.pathname === url;

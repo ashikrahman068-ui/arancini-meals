@@ -16,6 +16,7 @@ import PaymentSuccess from './pages/PaymentSuccess';
 import SubscriptionCheckout from './pages/SubscriptionCheckout';
 import Subscriptions from './pages/Subscriptions';
 import Welcome from './pages/Welcome';
+import AdminData from './pages/AdminData';
 import __Layout from './Layout.jsx';
 
 
@@ -38,6 +39,7 @@ export const PAGES = {
     "SubscriptionCheckout": SubscriptionCheckout,
     "Subscriptions": Subscriptions,
     "Welcome": Welcome,
+    "AdminData": AdminData,
 }
 
 export const pagesConfig = {
