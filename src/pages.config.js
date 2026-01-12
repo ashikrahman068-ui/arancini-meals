@@ -1,4 +1,5 @@
 import Account from './pages/Account';
+import AdminData from './pages/AdminData';
 import Blog from './pages/Blog';
 import BlogPost from './pages/BlogPost';
 import Cart from './pages/Cart';
@@ -16,12 +17,12 @@ import PaymentSuccess from './pages/PaymentSuccess';
 import SubscriptionCheckout from './pages/SubscriptionCheckout';
 import Subscriptions from './pages/Subscriptions';
 import Welcome from './pages/Welcome';
-import AdminData from './pages/AdminData';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
     "Account": Account,
+    "AdminData": AdminData,
     "Blog": Blog,
     "BlogPost": BlogPost,
     "Cart": Cart,
@@ -39,7 +40,6 @@ export const PAGES = {
     "SubscriptionCheckout": SubscriptionCheckout,
     "Subscriptions": Subscriptions,
     "Welcome": Welcome,
-    "AdminData": AdminData,
 }
 
 export const pagesConfig = {

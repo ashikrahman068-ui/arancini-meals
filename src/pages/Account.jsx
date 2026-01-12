@@ -218,7 +218,51 @@ export default function Account() {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="profile">
+          <TabsContent value="profile" className="space-y-6">
+            {/* Active Subscription Summary */}
+            {subscriptions.length > 0 && subscriptions[0].status === 'active' && (
+              <Card className="border-green-200 bg-green-50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-green-900">
+                    <Calendar className="w-5 h-5" />
+                    Active Subscription
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <p className="text-green-700 font-semibold">Plan</p>
+                      <p className="text-green-900">{subscriptions[0].plan_name}</p>
+                    </div>
+                    <div>
+                      <p className="text-green-700 font-semibold">Meals Per Week</p>
+                      <p className="text-green-900">{subscriptions[0].meals_per_week} meals</p>
+                    </div>
+                    <div>
+                      <p className="text-green-700 font-semibold">Delivery Day</p>
+                      <p className="text-green-900 capitalize">{subscriptions[0].delivery_schedule?.delivery_day}</p>
+                    </div>
+                    <div>
+                      <p className="text-green-700 font-semibold">Next Delivery</p>
+                      <p className="text-green-900">
+                        {subscriptions[0].delivery_schedule?.next_delivery_date 
+                          ? new Date(subscriptions[0].delivery_schedule.next_delivery_date).toLocaleDateString()
+                          : 'Not scheduled'}
+                      </p>
+                    </div>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setActiveTab('subscriptions')}
+                    className="w-full"
+                  >
+                    Manage Subscription
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
             <form onSubmit={handleUpdate}>
               <Card>
                 <CardHeader>
