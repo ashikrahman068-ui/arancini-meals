@@ -13,6 +13,7 @@ import { createPageUrl } from '@/utils';
 import ReferralSection from '../components/account/ReferralSection';
 import SubscriptionManagement from '../components/subscription/SubscriptionManagement';
 import SkipDelivery from '../components/subscription/SkipDelivery';
+import DeliveryScheduleManager from '../components/subscription/DeliveryScheduleManager';
 
 export default function Account() {
   const [user, setUser] = useState(null);
@@ -340,9 +341,13 @@ export default function Account() {
             ) : (
               <div className="space-y-6">
                 {subscriptions.map((subscription) => (
-                  <div key={subscription.id} className="space-y-4">
+                  <div key={subscription.id} className="space-y-6">
                     <SubscriptionManagement 
                       subscription={subscription} 
+                      onUpdate={loadSubscriptions}
+                    />
+                    <DeliveryScheduleManager
+                      subscription={subscription}
                       onUpdate={loadSubscriptions}
                     />
                     {subscription.status === 'active' && (
