@@ -69,11 +69,9 @@ Deno.serve(async (req) => {
                     const stripeSubscription = await stripe.subscriptions.retrieve(session.subscription);
                     
                     // Get the subscription draft if exists
-                    let draftData = null;
                     if (draftId) {
                         try {
                             const draft = await base44.asServiceRole.entities.SubscriptionDraft.get(draftId);
-                            draftData = draft;
                             
                             // Mark draft as completed
                             await base44.asServiceRole.entities.SubscriptionDraft.update(draftId, {
@@ -84,23 +82,31 @@ Deno.serve(async (req) => {
                         }
                     }
 
-                    // Update subscription with Stripe data
-                    const subscription = await base44.asServiceRole.entities.Subscription.get(subscriptionId);
-                    
-                    await base44.asServiceRole.entities.Subscription.update(subscriptionId, {
-                        status: 'active',
-                        stripe_subscription_id: stripeSubscription.id,
-                        stripe_customer_id: session.customer,
-                        billing_info: {
-                            ...subscription.billing_info,
-                            payment_method: session.payment_method_types?.[0] || 'stripe',
-                            last_payment_date: new Date(stripeSubscription.current_period_start * 1000).toISOString().split('T')[0],
-                            next_billing_date: new Date(stripeSubscription.current_period_end * 1000).toISOString().split('T')[0],
-                            billing_cycle_count: 1
-                        }
-                    });
+                    // Get subscription and verify it exists
+                    try {
+                        const subscription = await base44.asServiceRole.entities.Subscription.get(subscriptionId);
+                        
+                        if (subscription) {
+                            await base44.asServiceRole.entities.Subscription.update(subscriptionId, {
+                                status: 'active',
+                                stripe_subscription_id: stripeSubscription.id,
+                                stripe_customer_id: session.customer,
+                                billing_info: {
+                                    ...subscription.billing_info,
+                                    payment_method: session.payment_method_types?.[0] || 'stripe',
+                                    last_payment_date: new Date(stripeSubscription.current_period_start * 1000).toISOString().split('T')[0],
+                                    next_billing_date: new Date(stripeSubscription.current_period_end * 1000).toISOString().split('T')[0],
+                                    billing_cycle_count: 1
+                                }
+                            });
 
-                    console.log('Subscription activated:', subscriptionId);
+                            console.log('Subscription activated:', subscriptionId);
+                        } else {
+                            console.error('Subscription not found:', subscriptionId);
+                        }
+                    } catch (error) {
+                        console.error('Error updating subscription:', error);
+                    }
                 }
                 break;
             }
@@ -144,6 +150,11 @@ Deno.serve(async (req) => {
                             },
                             start_date: new Date().toISOString().split('T')[0],
                             discount_code: draft.referral_code
+                        });
+                        
+                        // Mark draft as completed
+                        await base44.asServiceRole.entities.SubscriptionDraft.update(draftId, {
+                            status: 'completed'
                         });
                         
                         console.log('Subscription created from draft:', draftId);

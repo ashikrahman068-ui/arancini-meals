@@ -11,15 +11,18 @@ Deno.serve(async (req) => {
 
         const draftData = await req.json();
 
-        // Validate cutoff
+        // Validate cutoff - Sunday 12:00 PM
         const now = new Date();
-        const dayOfWeek = now.getDay();
+        const dayOfWeek = now.getDay(); // 0 = Sunday, 6 = Saturday
         const hour = now.getHours();
-        const beforeCutoff = dayOfWeek < 6 || (dayOfWeek === 6 && hour < 23);
+        const minute = now.getMinutes();
+        
+        // Cutoff is Sunday 12:00 PM (noon)
+        const afterCutoff = dayOfWeek === 0 && (hour > 12 || (hour === 12 && minute > 0));
 
-        if (!beforeCutoff) {
+        if (afterCutoff) {
             return Response.json({ 
-                error: 'Subscriptions cannot be created after Saturday 11:59 PM. Please try again on Sunday.',
+                error: 'Subscriptions cannot be created after Sunday 12:00 PM. Please try again later this week.',
                 cutoffExceeded: true
             }, { status: 403 });
         }
