@@ -4,8 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { Calendar, Clock, Pause, Play, AlertCircle, Loader2 } from 'lucide-react';
+import { Calendar, Clock, Pause, Play, AlertCircle, Loader2, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
+import RecommendedMeals from '../meals/RecommendedMeals';
 
 export default function DeliveryScheduleManager({ subscription, onUpdate }) {
   const [upcomingDeliveries, setUpcomingDeliveries] = useState([]);
@@ -148,6 +149,27 @@ export default function DeliveryScheduleManager({ subscription, onUpdate }) {
 
   return (
     <div className="space-y-6">
+      {/* AI Recommendations for Upcoming Delivery */}
+      {subscription?.status === 'active' && (
+        <Card className="border-2 border-yellow-200 bg-gradient-to-br from-yellow-50 to-orange-50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-yellow-600" />
+              Meal Suggestions for Your Next Delivery
+            </CardTitle>
+            <CardDescription>
+              AI-powered recommendations based on your preferences and past orders
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <RecommendedMeals 
+              context="general" 
+              title="Perfect for Your Next Delivery"
+            />
+          </CardContent>
+        </Card>
+      )}
+
       {/* Upcoming Deliveries */}
       <Card>
         <CardHeader>
