@@ -6,7 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, User as UserIcon, LogOut, Gift, UserPlus, LogIn, Calendar } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Loader2, User as UserIcon, LogOut, Gift, UserPlus, LogIn, Calendar, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -109,6 +110,19 @@ export default function Account() {
 
   const handleLogin = () => {
     base44.auth.redirectToLogin(window.location.origin + createPageUrl('Account'));
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      // Note: This will fail since backend functions require upgrade
+      // But we're adding the UI as requested
+      await base44.functions.invoke('deleteUserAccount', {});
+      toast.success('Account deletion requested. You will be logged out.');
+      handleLogout();
+    } catch (error) {
+      toast.error('Account deletion is not available. Please contact support.');
+      console.error('Delete account error:', error);
+    }
   };
 
   if (loading) {
@@ -310,7 +324,7 @@ export default function Account() {
                     </div>
                   </div>
                   <div className="flex justify-end">
-                    <Button type="submit" disabled={updating}>
+                    <Button type="submit" disabled={updating} className="min-h-[44px]">
                       {updating ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                       Save Changes
                     </Button>
@@ -318,6 +332,44 @@ export default function Account() {
                 </CardContent>
               </Card>
             </form>
+
+            {/* Account Deletion */}
+            <Card className="border-red-200 bg-red-50">
+              <CardHeader>
+                <CardTitle className="text-red-900">Danger Zone</CardTitle>
+                <CardDescription className="text-red-700">
+                  Permanently delete your account and all associated data
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" className="min-h-[44px]">
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Delete Account
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently delete your account,
+                        cancel all subscriptions, and remove all your data from our servers.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel className="min-h-[44px]">Cancel</AlertDialogCancel>
+                      <AlertDialogAction 
+                        onClick={handleDeleteAccount}
+                        className="bg-red-600 hover:bg-red-700 min-h-[44px]"
+                      >
+                        Yes, Delete My Account
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="subscriptions">

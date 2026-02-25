@@ -14,7 +14,8 @@ import {
   Facebook,
   Instagram,
   Music,
-  Truck
+  Truck,
+  ArrowLeft
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +23,7 @@ import { Toaster } from "@/components/ui/sonner";
 import ChatTrigger from "./components/agents/ChatTrigger";
 import ChatWidget from "./components/agents/ChatWidget";
 import { CartProvider, useCart } from "./components/cart/CartContext";
+import BottomNav from "./components/navigation/BottomNav";
 
 function LayoutContent({ children, currentPageName }) {
   const location = useLocation();
@@ -140,16 +142,33 @@ function LayoutContent({ children, currentPageName }) {
     );
   }
 
+  const isRootPage = location.pathname === createPageUrl('Home') || location.pathname === '/';
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white pb-16 lg:pb-0">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-green-100">
+      <header 
+        className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-green-100"
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <Link to={createPageUrl("Home")} className="flex items-center space-x-3 group">
-              <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/74c11fd48_IMG_5236.png" alt="Arancini Meals Logo" className="h-24" />
-            </Link>
+          <div className="flex justify-between items-center h-16 min-h-[44px]">
+            {/* Back Button (Mobile) + Logo */}
+            <div className="flex items-center gap-2">
+              {!isRootPage && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => navigate(-1)}
+                  className="lg:hidden min-h-[44px] min-w-[44px]"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </Button>
+              )}
+              <Link to={createPageUrl("Home")} className="flex items-center space-x-3 group">
+                <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/74c11fd48_IMG_5236.png" alt="Arancini Meals Logo" className="h-24" />
+              </Link>
+            </div>
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center space-x-1">
@@ -178,7 +197,7 @@ function LayoutContent({ children, currentPageName }) {
             <Button
               variant="ghost"
               size="icon"
-              className="lg:hidden"
+              className="lg:hidden min-h-[44px] min-w-[44px]"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -220,6 +239,9 @@ function LayoutContent({ children, currentPageName }) {
         {children}
       </main>
       <Toaster richColors />
+
+      {/* Bottom Navigation (Mobile) */}
+      <BottomNav />
 
       {/* Chat Widget */}
       <ChatTrigger isOpen={isChatOpen} onClick={() => setIsChatOpen(!isChatOpen)} />
