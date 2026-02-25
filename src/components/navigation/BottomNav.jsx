@@ -22,8 +22,12 @@ export default function BottomNav() {
 
   return (
     <nav 
-      className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 shadow-lg"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      className="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 z-50 shadow-lg"
+      style={{ 
+        paddingBottom: 'max(env(safe-area-inset-bottom), 0px)',
+        transform: 'translateZ(0)',
+        backfaceVisibility: 'hidden'
+      }}
     >
       <div className="grid grid-cols-5 h-16">
         {navItems.map((item) => {

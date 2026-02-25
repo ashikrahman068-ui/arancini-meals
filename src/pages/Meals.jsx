@@ -12,6 +12,8 @@ import {
   UtensilsCrossed
 } from "lucide-react";
 import { useCart } from "../components/cart/CartContext";
+import PullToRefresh from "../components/common/PullToRefresh";
+import PageTransition from "../components/common/PageTransition";
 
 import MealCard from "../components/meals/MealCard";
 import MealFilters from "../components/meals/MealFilters";
@@ -167,8 +169,10 @@ export default function Meals() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <PageTransition>
+      <PullToRefresh onRefresh={loadMeals}>
+        <div className="min-h-screen bg-gradient-to-b from-green-50 to-white py-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
@@ -301,13 +305,15 @@ export default function Meals() {
         )}
       </div>
 
-      {/* Meal Details Modal */}
-      <MealDetailsModal
-        meal={selectedMeal}
-        isOpen={showMealDetails}
-        onClose={handleCloseMealDetails}
-        onAddToCart={handleAddToCart}
-      />
-    </div>
+          {/* Meal Details Modal */}
+          <MealDetailsModal
+            meal={selectedMeal}
+            isOpen={showMealDetails}
+            onClose={handleCloseMealDetails}
+            onAddToCart={handleAddToCart}
+          />
+        </div>
+      </PullToRefresh>
+    </PageTransition>
   );
 }

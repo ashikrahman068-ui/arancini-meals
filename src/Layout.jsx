@@ -32,8 +32,33 @@ function LayoutContent({ children, currentPageName }) {
   const [isChatOpen, setIsChatOpen] = React.useState(false);
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
   const [checkingAuth, setCheckingAuth] = React.useState(true);
-  const [userRole, setUserRole] = React.useState(null); // Added userRole state
+  const [userRole, setUserRole] = React.useState(null);
   const { getTotalItems } = useCart();
+
+  // Auto dark mode detection
+  React.useEffect(() => {
+    const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    const handleDarkModeChange = (e) => {
+      if (e.matches) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    };
+
+    // Set initial state
+    if (darkModeQuery.matches) {
+      document.documentElement.classList.add('dark');
+    }
+
+    // Listen for changes
+    darkModeQuery.addEventListener('change', handleDarkModeChange);
+
+    return () => {
+      darkModeQuery.removeEventListener('change', handleDarkModeChange);
+    };
+  }, []);
 
   React.useEffect(() => {
     checkAuthentication();
