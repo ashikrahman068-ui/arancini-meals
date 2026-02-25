@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
@@ -17,6 +16,7 @@ import { useCart } from "../components/cart/CartContext";
 import MealCard from "../components/meals/MealCard";
 import MealFilters from "../components/meals/MealFilters";
 import MealDetailsModal from "../components/meals/MealDetailsModal";
+import RecommendedMeals from "../components/meals/RecommendedMeals";
 
 export default function Meals() {
   const [meals, setMeals] = useState([]);
@@ -215,6 +215,13 @@ export default function Meals() {
             </div>
           </div>
         </div>
+
+        {/* AI-Powered Recommendations */}
+        {!searchTerm && selectedCategory === 'all' && selectedDietary === 'all' && (
+          <div className="mb-12">
+            <RecommendedMeals context="general" title="Recommended For You" />
+          </div>
+        )}
 
         {/* Filters */}
         <div className="mb-8">
