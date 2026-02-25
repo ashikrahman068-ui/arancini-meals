@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import {
@@ -24,6 +23,7 @@ import {
 } from "lucide-react";
 import ReviewForm from '../reviews/ReviewForm';
 import ReviewList from '../reviews/ReviewList';
+import RecommendedMeals from './RecommendedMeals';
 
 export default function MealDetailsModal({ meal, isOpen, onClose, onAddToCart }) {
   const [reviews, setReviews] = useState([]);
@@ -443,6 +443,14 @@ export default function MealDetailsModal({ meal, isOpen, onClose, onAddToCart })
             <ReviewList reviews={reviews} />
           )}
         </div>
+
+        {/* AI-Powered Recommendations */}
+        <Separator className="my-6" />
+        <RecommendedMeals 
+          currentMealId={meal.id} 
+          context="similar"
+          title="You Might Also Like"
+        />
       </DialogContent>
     </Dialog>
   );
