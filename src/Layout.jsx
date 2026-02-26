@@ -35,6 +35,31 @@ function LayoutContent({ children, currentPageName }) {
   const [userRole, setUserRole] = React.useState(null);
   const { getTotalItems } = useCart();
 
+  // Auto dark mode detection
+  React.useEffect(() => {
+    const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    const handleDarkModeChange = (e) => {
+      if (e.matches) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    };
+
+    // Set initial state
+    if (darkModeQuery.matches) {
+      document.documentElement.classList.add('dark');
+    }
+
+    // Listen for changes
+    darkModeQuery.addEventListener('change', handleDarkModeChange);
+
+    return () => {
+      darkModeQuery.removeEventListener('change', handleDarkModeChange);
+    };
+  }, []);
+
   React.useEffect(() => {
     checkAuthentication();
   }, [location.pathname]);
@@ -161,6 +186,7 @@ function LayoutContent({ children, currentPageName }) {
                   size="icon"
                   onClick={() => navigate(-1)}
                   className="lg:hidden min-h-[44px] min-w-[44px]"
+                  aria-label="Go back"
                 >
                   <ArrowLeft className="w-5 h-5" />
                 </Button>
@@ -199,6 +225,7 @@ function LayoutContent({ children, currentPageName }) {
               size="icon"
               className="lg:hidden min-h-[44px] min-w-[44px]"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
             >
               {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </Button>

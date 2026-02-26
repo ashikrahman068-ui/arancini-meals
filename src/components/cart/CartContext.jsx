@@ -31,6 +31,7 @@ export const CartProvider = ({ children }) => {
   }, [cartItems]);
 
   const addToCart = (meal) => {
+    // Optimistic UI update - immediately reflect changes
     setCartItems(prev => {
       const existingIndex = prev.findIndex(item => item.id === meal.id);
       if (existingIndex > -1) {
@@ -42,6 +43,7 @@ export const CartProvider = ({ children }) => {
       }
       return [...prev, { ...meal, quantity: 1 }];
     });
+    // Note: If you have API calls, they would go here after the optimistic update
   };
 
   const removeFromCart = (mealId) => {
@@ -53,6 +55,7 @@ export const CartProvider = ({ children }) => {
       removeFromCart(mealId);
       return;
     }
+    // Optimistic UI update - immediately reflect changes
     setCartItems(prev => 
       prev.map(item => 
         item.id === mealId 
@@ -60,6 +63,7 @@ export const CartProvider = ({ children }) => {
           : item
       )
     );
+    // Note: If you have API calls, they would go here after the optimistic update
   };
 
   const addMultipleToCart = (meals) => {

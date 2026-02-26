@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Home, UtensilsCrossed, Calendar, ShoppingCart, User } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -8,7 +8,15 @@ import { cn } from '@/lib/utils';
 
 export default function BottomNav() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { getTotalItems } = useCart();
+
+  const handleNavClick = (url, e) => {
+    e.preventDefault();
+    // Reset scroll position when navigating
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    navigate(url);
+  };
 
   const navItems = [
     { name: 'Home', url: createPageUrl('Home'), icon: Home },
@@ -38,10 +46,13 @@ export default function BottomNav() {
             <Link
               key={item.name}
               to={item.url}
+              onClick={(e) => handleNavClick(item.url, e)}
               className={cn(
                 "flex flex-col items-center justify-center gap-1 relative transition-colors min-h-[44px]",
                 active ? "text-green-600" : "text-gray-500 hover:text-green-600"
               )}
+              aria-label={`Navigate to ${item.name}`}
+              aria-current={active ? "page" : undefined}
             >
               <div className="relative">
                 <Icon className={cn("w-6 h-6", active && "scale-110")} />
