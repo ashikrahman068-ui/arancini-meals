@@ -35,32 +35,24 @@ function LayoutContent({ children, currentPageName }) {
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
   const [checkingAuth, setCheckingAuth] = React.useState(true);
   const [userRole, setUserRole] = React.useState(null);
+  const [isDarkMode, setIsDarkMode] = React.useState(() => {
+    const saved = localStorage.getItem('theme');
+    if (saved) return saved === 'dark';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
   const { getTotalItems } = useCart();
 
-  // Auto dark mode detection
   React.useEffect(() => {
-    const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    
-    const handleDarkModeChange = (e) => {
-      if (e.matches) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    };
-
-    // Set initial state
-    if (darkModeQuery.matches) {
+    if (isDarkMode) {
       document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
     }
+  }, [isDarkMode]);
 
-    // Listen for changes
-    darkModeQuery.addEventListener('change', handleDarkModeChange);
-
-    return () => {
-      darkModeQuery.removeEventListener('change', handleDarkModeChange);
-    };
-  }, []);
+  const toggleDarkMode = () => setIsDarkMode(prev => !prev);
 
   React.useEffect(() => {
     checkAuthentication();
