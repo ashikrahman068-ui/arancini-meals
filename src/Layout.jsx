@@ -191,7 +191,7 @@ function LayoutContent({ children, currentPageName }) {
             </div>
 
             {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-1">
+            <nav className="hidden lg:flex items-center space-x-1 flex-1 justify-center">
               {navigationItems.map((item) => (
                 <Link
                   key={item.name}
