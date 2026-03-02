@@ -15,9 +15,7 @@ import {
   Instagram,
   Music,
   Truck,
-  ArrowLeft,
-  Sun,
-  Moon
+  ArrowLeft
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -35,24 +33,32 @@ function LayoutContent({ children, currentPageName }) {
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
   const [checkingAuth, setCheckingAuth] = React.useState(true);
   const [userRole, setUserRole] = React.useState(null);
-  const [isDarkMode, setIsDarkMode] = React.useState(() => {
-    const saved = localStorage.getItem('theme');
-    if (saved) return saved === 'dark';
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
-  });
   const { getTotalItems } = useCart();
 
+  // Auto dark mode detection
   React.useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-  }, [isDarkMode]);
+    const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    const handleDarkModeChange = (e) => {
+      if (e.matches) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    };
 
-  const toggleDarkMode = () => setIsDarkMode(prev => !prev);
+    // Set initial state
+    if (darkModeQuery.matches) {
+      document.documentElement.classList.add('dark');
+    }
+
+    // Listen for changes
+    darkModeQuery.addEventListener('change', handleDarkModeChange);
+
+    return () => {
+      darkModeQuery.removeEventListener('change', handleDarkModeChange);
+    };
+  }, []);
 
   React.useEffect(() => {
     checkAuthentication();
@@ -191,7 +197,7 @@ function LayoutContent({ children, currentPageName }) {
             </div>
 
             {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-1 flex-1 justify-center">
+            <nav className="hidden lg:flex items-center space-x-1">
               {navigationItems.map((item) => (
                 <Link
                   key={item.name}
@@ -213,27 +219,16 @@ function LayoutContent({ children, currentPageName }) {
               ))}
             </nav>
 
-            {/* Dark mode toggle + Mobile menu button */}
-            <div className="flex items-center gap-1">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleDarkMode}
-                className="min-h-[44px] min-w-[44px]"
-                aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
-              >
-                {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="lg:hidden min-h-[44px] min-w-[44px]"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
-              >
-                {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-              </Button>
-            </div>
+            {/* Mobile menu button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden min-h-[44px] min-w-[44px]"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+            >
+              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </Button>
           </div>
         </div>
 
