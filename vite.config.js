@@ -7,7 +7,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 export default defineConfig({
   plugins: [
     base44({
-      legacySDKImports: process.env.BASE44_LEGACY_SDK_IMPORTS === 'true'
+      legacySDKImports: true
     }),
     react(),
     VitePWA({
