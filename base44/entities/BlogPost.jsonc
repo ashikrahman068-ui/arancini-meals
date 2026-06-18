@@ -1,0 +1,124 @@
+{
+  "name": "BlogPost",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Blog post title"
+    },
+    "slug": {
+      "type": "string",
+      "description": "URL-friendly slug for the post"
+    },
+    "excerpt": {
+      "type": "string",
+      "description": "Short description/summary of the post"
+    },
+    "content": {
+      "type": "string",
+      "description": "Full blog post content (supports markdown)"
+    },
+    "featured_image_url": {
+      "type": "string",
+      "description": "Main image for the post"
+    },
+    "author_email": {
+      "type": "string",
+      "description": "Email of the post author"
+    },
+    "author_name": {
+      "type": "string",
+      "description": "Display name of the author"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "published",
+        "archived"
+      ],
+      "default": "draft",
+      "description": "Publication status"
+    },
+    "published_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the post was published"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "nutrition",
+        "recipes",
+        "health",
+        "lifestyle",
+        "news"
+      ],
+      "description": "Post category"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Tags for the post"
+    },
+    "seo_title": {
+      "type": "string",
+      "description": "SEO optimized title (60 chars max)"
+    },
+    "seo_description": {
+      "type": "string",
+      "description": "SEO meta description (160 chars max)"
+    },
+    "seo_keywords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "SEO keywords"
+    },
+    "views_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of views"
+    },
+    "reading_time": {
+      "type": "number",
+      "description": "Estimated reading time in minutes"
+    },
+    "is_featured": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether to feature this post"
+    }
+  },
+  "required": [
+    "title",
+    "slug",
+    "content",
+    "author_email"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "status": "published"
+        },
+        {
+          "author_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

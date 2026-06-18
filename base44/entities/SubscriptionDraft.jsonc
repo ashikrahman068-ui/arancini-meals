@@ -1,0 +1,147 @@
+{
+  "name": "SubscriptionDraft",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email of the user creating the draft"
+    },
+    "plan_id": {
+      "type": "string",
+      "description": "ID of the selected plan"
+    },
+    "plan_name": {
+      "type": "string",
+      "description": "Name of the subscription plan"
+    },
+    "plan_type": {
+      "type": "string",
+      "enum": [
+        "weekly",
+        "bi-weekly",
+        "monthly"
+      ],
+      "description": "Subscription frequency"
+    },
+    "meals_per_week": {
+      "type": "number",
+      "description": "Number of meals per week"
+    },
+    "price_per_delivery": {
+      "type": "number",
+      "description": "Price for each delivery"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional description or notes for this subscription draft"
+    },
+    "selected_meals": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Array of meal IDs"
+    },
+    "dietary_preferences": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Dietary restrictions"
+    },
+    "delivery_schedule": {
+      "type": "object",
+      "properties": {
+        "delivery_day": {
+          "type": "string"
+        },
+        "time_slot": {
+          "type": "string"
+        },
+        "next_delivery_date": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "delivery_address": {
+      "type": "object",
+      "properties": {
+        "street": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "zip": {
+          "type": "string"
+        },
+        "special_instructions": {
+          "type": "string"
+        }
+      }
+    },
+    "referral_code": {
+      "type": "string",
+      "description": "Applied referral code"
+    },
+    "payment_method": {
+      "type": "string",
+      "enum": [
+        "card",
+        "paypal"
+      ],
+      "description": "Selected payment method"
+    },
+    "stripe_price_id": {
+      "type": "string",
+      "description": "Stripe Price ID for the plan"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "completed",
+        "expired"
+      ],
+      "default": "pending",
+      "description": "Draft status"
+    }
+  },
+  "required": [
+    "user_email",
+    "plan_id",
+    "plan_name",
+    "plan_type"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

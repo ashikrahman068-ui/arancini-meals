@@ -1,0 +1,247 @@
+{
+  "name": "MealPlan",
+  "type": "object",
+  "properties": {
+    "plan_name": {
+      "type": "string",
+      "description": "Name of the meal plan"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "User email who owns this plan"
+    },
+    "week_start_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Start date of the week"
+    },
+    "plan_type": {
+      "type": "string",
+      "enum": [
+        "weight_loss",
+        "muscle_gain",
+        "maintenance",
+        "custom"
+      ],
+      "description": "Type of meal plan"
+    },
+    "target_calories": {
+      "type": "number",
+      "description": "Target daily calories"
+    },
+    "dietary_preferences": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Dietary restrictions and preferences"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional description of the meal plan"
+    },
+    "meals": {
+      "type": "object",
+      "properties": {
+        "monday": {
+          "type": "object",
+          "properties": {
+            "breakfast": {
+              "type": "string",
+              "description": "Meal ID"
+            },
+            "lunch": {
+              "type": "string",
+              "description": "Meal ID"
+            },
+            "dinner": {
+              "type": "string",
+              "description": "Meal ID"
+            },
+            "snacks": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "tuesday": {
+          "type": "object",
+          "properties": {
+            "breakfast": {
+              "type": "string"
+            },
+            "lunch": {
+              "type": "string"
+            },
+            "dinner": {
+              "type": "string"
+            },
+            "snacks": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "wednesday": {
+          "type": "object",
+          "properties": {
+            "breakfast": {
+              "type": "string"
+            },
+            "lunch": {
+              "type": "string"
+            },
+            "dinner": {
+              "type": "string"
+            },
+            "snacks": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "thursday": {
+          "type": "object",
+          "properties": {
+            "breakfast": {
+              "type": "string"
+            },
+            "lunch": {
+              "type": "string"
+            },
+            "dinner": {
+              "type": "string"
+            },
+            "snacks": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "friday": {
+          "type": "object",
+          "properties": {
+            "breakfast": {
+              "type": "string"
+            },
+            "lunch": {
+              "type": "string"
+            },
+            "dinner": {
+              "type": "string"
+            },
+            "snacks": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "saturday": {
+          "type": "object",
+          "properties": {
+            "breakfast": {
+              "type": "string"
+            },
+            "lunch": {
+              "type": "string"
+            },
+            "dinner": {
+              "type": "string"
+            },
+            "snacks": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "sunday": {
+          "type": "object",
+          "properties": {
+            "breakfast": {
+              "type": "string"
+            },
+            "lunch": {
+              "type": "string"
+            },
+            "dinner": {
+              "type": "string"
+            },
+            "snacks": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "total_nutrition": {
+      "type": "object",
+      "properties": {
+        "daily_avg_calories": {
+          "type": "number"
+        },
+        "daily_avg_protein": {
+          "type": "number"
+        },
+        "daily_avg_carbs": {
+          "type": "number"
+        },
+        "daily_avg_fat": {
+          "type": "number"
+        }
+      }
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this is the user's active meal plan"
+    }
+  },
+  "required": [
+    "plan_name",
+    "user_email",
+    "week_start_date",
+    "plan_type"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

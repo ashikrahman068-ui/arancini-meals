@@ -1,0 +1,203 @@
+{
+  "name": "Subscription",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email of the subscriber"
+    },
+    "plan_type": {
+      "type": "string",
+      "enum": [
+        "weekly",
+        "bi-weekly",
+        "monthly"
+      ],
+      "description": "Subscription frequency"
+    },
+    "plan_name": {
+      "type": "string",
+      "description": "Name of the subscription plan"
+    },
+    "meals_per_week": {
+      "type": "number",
+      "description": "Number of meals per week"
+    },
+    "price_per_delivery": {
+      "type": "number",
+      "description": "Price for each delivery"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "active",
+        "paused",
+        "cancelled",
+        "expired",
+        "payment_failed"
+      ],
+      "default": "pending",
+      "description": "Subscription status"
+    },
+    "stripe_subscription_id": {
+      "type": "string",
+      "description": "Stripe subscription ID"
+    },
+    "stripe_customer_id": {
+      "type": "string",
+      "description": "Stripe customer ID"
+    },
+    "meal_preferences": {
+      "type": "object",
+      "properties": {
+        "selected_meals": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Array of meal IDs for the subscription"
+        },
+        "dietary_preferences": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Dietary restrictions"
+        },
+        "excluded_ingredients": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Ingredients to avoid"
+        }
+      }
+    },
+    "delivery_schedule": {
+      "type": "object",
+      "properties": {
+        "delivery_day": {
+          "type": "string",
+          "enum": [
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday"
+          ],
+          "description": "Preferred delivery day"
+        },
+        "time_slot": {
+          "type": "string",
+          "enum": [
+            "morning",
+            "afternoon",
+            "evening"
+          ],
+          "description": "Preferred delivery time"
+        },
+        "next_delivery_date": {
+          "type": "string",
+          "format": "date",
+          "description": "Date of next scheduled delivery"
+        }
+      }
+    },
+    "delivery_address": {
+      "type": "object",
+      "properties": {
+        "street": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "zip": {
+          "type": "string"
+        },
+        "special_instructions": {
+          "type": "string"
+        }
+      }
+    },
+    "billing_info": {
+      "type": "object",
+      "properties": {
+        "payment_method": {
+          "type": "string",
+          "description": "Payment method used"
+        },
+        "last_payment_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "next_billing_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "billing_cycle_count": {
+          "type": "number",
+          "default": 0,
+          "description": "Number of billing cycles completed"
+        }
+      }
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Subscription start date"
+    },
+    "discount_code": {
+      "type": "string",
+      "description": "Applied discount code"
+    },
+    "discount_percentage": {
+      "type": "number",
+      "default": 0,
+      "description": "Discount percentage applied"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes"
+    }
+  },
+  "required": [
+    "user_email",
+    "plan_type",
+    "plan_name",
+    "meals_per_week",
+    "price_per_delivery"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

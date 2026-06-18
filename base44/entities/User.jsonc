@@ -1,0 +1,188 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "phone": {
+      "type": "string",
+      "description": "Phone number"
+    },
+    "date_of_birth": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of birth"
+    },
+    "gender": {
+      "type": "string",
+      "enum": [
+        "male",
+        "female",
+        "other",
+        "prefer_not_to_say"
+      ],
+      "description": "Gender"
+    },
+    "height": {
+      "type": "number",
+      "description": "Height in inches"
+    },
+    "weight": {
+      "type": "number",
+      "description": "Weight in pounds"
+    },
+    "activity_level": {
+      "type": "string",
+      "enum": [
+        "sedentary",
+        "lightly_active",
+        "moderately_active",
+        "very_active",
+        "extremely_active"
+      ],
+      "description": "Activity level"
+    },
+    "fitness_goal": {
+      "type": "string",
+      "enum": [
+        "lose_weight",
+        "gain_muscle",
+        "maintain_weight",
+        "improve_health"
+      ],
+      "description": "Primary fitness goal"
+    },
+    "dietary_restrictions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Dietary restrictions and allergies"
+    },
+    "preferred_cuisines": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Preferred cuisine types"
+    },
+    "delivery_addresses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "street": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "zip": {
+            "type": "string"
+          },
+          "is_default": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      }
+    },
+    "loyalty_points": {
+      "type": "number",
+      "default": 0,
+      "description": "Accumulated loyalty points"
+    },
+    "loyalty_tier": {
+      "type": "string",
+      "enum": [
+        "bronze",
+        "silver",
+        "gold",
+        "platinum"
+      ],
+      "default": "bronze",
+      "description": "Current loyalty tier"
+    },
+    "total_orders": {
+      "type": "number",
+      "default": 0,
+      "description": "Total number of orders placed"
+    },
+    "total_spent": {
+      "type": "number",
+      "default": 0,
+      "description": "Total amount spent"
+    },
+    "subscription_plan": {
+      "type": "string",
+      "enum": [
+        "none",
+        "weekly",
+        "bi-weekly",
+        "monthly"
+      ],
+      "default": "none",
+      "description": "Subscription plan type"
+    },
+    "referral_code": {
+      "type": "string",
+      "description": "User's unique referral code"
+    },
+    "referral_credits": {
+      "type": "number",
+      "default": 0,
+      "description": "Credits earned from referrals"
+    },
+    "referred_by": {
+      "type": "string",
+      "description": "Referral code of the user who referred this user"
+    },
+    "total_referrals": {
+      "type": "number",
+      "default": 0,
+      "description": "Total number of successful referrals"
+    }
+  },
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  },
+  "required": [
+    "phone",
+    "date_of_birth",
+    "gender",
+    "height",
+    "weight",
+    "activity_level",
+    "fitness_goal",
+    "dietary_restrictions",
+    "preferred_cuisines",
+    "delivery_addresses"
+  ]
+}

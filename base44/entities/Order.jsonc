@@ -1,0 +1,159 @@
+{
+  "name": "Order",
+  "type": "object",
+  "properties": {
+    "order_number": {
+      "type": "string",
+      "description": "Unique order identifier"
+    },
+    "customer_email": {
+      "type": "string",
+      "description": "Customer email address"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "confirmed",
+        "preparing",
+        "ready",
+        "delivered",
+        "cancelled"
+      ],
+      "default": "pending",
+      "description": "Order status"
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "meal_id": {
+            "type": "string"
+          },
+          "meal_name": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "price_per_item": {
+            "type": "number"
+          },
+          "customizations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "description": "Ordered meal items"
+    },
+    "subtotal": {
+      "type": "number",
+      "description": "Order subtotal"
+    },
+    "tax": {
+      "type": "number",
+      "description": "Tax amount"
+    },
+    "delivery_fee": {
+      "type": "number",
+      "description": "Delivery fee"
+    },
+    "discount_amount": {
+      "type": "number",
+      "default": 0,
+      "description": "Discount applied"
+    },
+    "total": {
+      "type": "number",
+      "description": "Total order amount"
+    },
+    "delivery_address": {
+      "type": "object",
+      "properties": {
+        "street": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "zip": {
+          "type": "string"
+        },
+        "special_instructions": {
+          "type": "string"
+        }
+      }
+    },
+    "delivery_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Requested delivery date"
+    },
+    "delivery_time_slot": {
+      "type": "string",
+      "enum": [
+        "morning",
+        "afternoon",
+        "evening"
+      ],
+      "description": "Preferred delivery time"
+    },
+    "payment_method": {
+      "type": "string",
+      "description": "Payment method used"
+    },
+    "payment_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "paid",
+        "failed",
+        "refunded"
+      ],
+      "default": "pending",
+      "description": "Payment status"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Special notes or requests"
+    }
+  },
+  "required": [
+    "customer_email",
+    "items",
+    "total"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "customer_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "customer_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -325,10 +325,10 @@ function LayoutContent({ children, currentPageName }) {
             <div>
               <h4 className="font-semibold mb-4">Quick Links</h4>
               <ul className="space-y-2 text-sm text-gray-400">
+                <li><Link to={createPageUrl("About")} className="hover:text-white transition-colors">About Us</Link></li>
+                <li><Link to={createPageUrl("Contact")} className="hover:text-white transition-colors">Contact Us</Link></li>
                 <li><a href="#" className="hover:text-white transition-colors">How It Works</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Nutrition Info</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Delivery Areas</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">FAQs</a></li>
               </ul>
             </div>
             

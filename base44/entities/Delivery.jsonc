@@ -1,0 +1,210 @@
+{
+  "name": "Delivery",
+  "type": "object",
+  "properties": {
+    "order_id": {
+      "type": "string",
+      "description": "Associated order ID"
+    },
+    "subscription_id": {
+      "type": "string",
+      "description": "Associated subscription ID (if applicable)"
+    },
+    "customer_email": {
+      "type": "string",
+      "description": "Customer email"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "confirmed",
+        "preparing",
+        "out_for_delivery",
+        "delivered",
+        "failed"
+      ],
+      "default": "pending",
+      "description": "Current delivery status"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional description or notes about the delivery"
+    },
+    "delivery_address": {
+      "type": "object",
+      "properties": {
+        "street": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "zip": {
+          "type": "string"
+        },
+        "special_instructions": {
+          "type": "string"
+        }
+      }
+    },
+    "scheduled_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Scheduled delivery date"
+    },
+    "scheduled_time_slot": {
+      "type": "string",
+      "enum": [
+        "morning",
+        "afternoon",
+        "evening"
+      ],
+      "description": "Scheduled time slot"
+    },
+    "estimated_arrival": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Estimated arrival timestamp"
+    },
+    "actual_delivery_time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Actual delivery timestamp"
+    },
+    "courier_info": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "vehicle": {
+          "type": "string"
+        },
+        "photo_url": {
+          "type": "string"
+        }
+      }
+    },
+    "tracking_number": {
+      "type": "string",
+      "description": "Unique tracking number"
+    },
+    "tracking_updates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "location": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Delivery tracking timeline"
+    },
+    "delivery_rating": {
+      "type": "object",
+      "properties": {
+        "overall_rating": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "timeliness_rating": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "packaging_rating": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "courier_rating": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "feedback": {
+          "type": "string"
+        },
+        "rated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "delivery_photo_url": {
+      "type": "string",
+      "description": "Photo proof of delivery"
+    },
+    "signature_url": {
+      "type": "string",
+      "description": "Digital signature URL"
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Any reported delivery issues"
+    },
+    "temperature_log": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "temperature": {
+            "type": "number"
+          }
+        }
+      },
+      "description": "Temperature monitoring during delivery"
+    }
+  },
+  "required": [
+    "customer_email",
+    "delivery_address",
+    "scheduled_date"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "customer_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

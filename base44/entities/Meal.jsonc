@@ -1,0 +1,159 @@
+{
+  "name": "Meal",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name of the meal"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of the meal"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "breakfast",
+        "lunch",
+        "dinner",
+        "snack",
+        "dessert"
+      ],
+      "description": "Meal category"
+    },
+    "cuisine_type": {
+      "type": "string",
+      "enum": [
+        "american",
+        "italian",
+        "asian",
+        "mexican",
+        "mediterranean",
+        "indian",
+        "thai",
+        "vegan",
+        "vegetarian"
+      ],
+      "description": "Cuisine type"
+    },
+    "dietary_tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "gluten-free",
+          "dairy-free",
+          "vegan",
+          "vegetarian",
+          "keto",
+          "paleo",
+          "low-carb",
+          "high-protein",
+          "nut-free"
+        ]
+      },
+      "description": "Dietary restrictions and preferences"
+    },
+    "prep_time": {
+      "type": "number",
+      "description": "Preparation time in minutes"
+    },
+    "cook_time": {
+      "type": "number",
+      "description": "Cooking time in minutes"
+    },
+    "servings": {
+      "type": "number",
+      "description": "Number of servings"
+    },
+    "price": {
+      "type": "number",
+      "description": "Price per serving"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "URL to meal image"
+    },
+    "ingredients": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "unit": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "List of ingredients"
+    },
+    "instructions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Cooking instructions"
+    },
+    "nutrition": {
+      "type": "object",
+      "properties": {
+        "calories": {
+          "type": "number"
+        },
+        "protein": {
+          "type": "number"
+        },
+        "carbs": {
+          "type": "number"
+        },
+        "fat": {
+          "type": "number"
+        },
+        "fiber": {
+          "type": "number"
+        },
+        "sugar": {
+          "type": "number"
+        },
+        "sodium": {
+          "type": "number"
+        }
+      },
+      "description": "Nutritional information per serving"
+    },
+    "popularity_score": {
+      "type": "number",
+      "default": 0,
+      "description": "Popularity ranking score"
+    },
+    "is_featured": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether meal is featured"
+    },
+    "is_available": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether meal is currently available"
+    }
+  },
+  "required": [
+    "name",
+    "description",
+    "category",
+    "price"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

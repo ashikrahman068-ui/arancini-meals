@@ -1,0 +1,56 @@
+{
+  "name": "Review",
+  "type": "object",
+  "properties": {
+    "meal_id": {
+      "type": "string"
+    },
+    "order_id": {
+      "type": "string"
+    },
+    "user_email": {
+      "type": "string"
+    },
+    "rating": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "comment": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional extended description for the review"
+    },
+    "sentiment": {
+      "type": "string",
+      "enum": [
+        "positive",
+        "neutral",
+        "negative"
+      ]
+    }
+  },
+  "required": [
+    "meal_id",
+    "user_email",
+    "rating"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "$or": [
+        {
+          "user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
