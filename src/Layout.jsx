@@ -125,6 +125,11 @@ function LayoutContent({ children, currentPageName }) {
       url: createPageUrl("AdminData"),
       icon: Receipt
     });
+    navigationItems.push({
+      name: "Meal Popularity",
+      url: createPageUrl("MealPopularity"),
+      icon: Receipt
+    });
   }
 
   const isActiveRoute = (url) => location.pathname === url;

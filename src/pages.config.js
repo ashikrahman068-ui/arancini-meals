@@ -58,6 +58,7 @@ import Checkout from './pages/Checkout';
 import Deliveries from './pages/Deliveries';
 import Home from './pages/Home';
 import ManageBlog from './pages/ManageBlog';
+import MealPopularity from './pages/MealPopularity';
 import ManageSubscription from './pages/ManageSubscription';
 import MealPlanner from './pages/MealPlanner';
 import Meals from './pages/Meals';
@@ -83,6 +84,7 @@ export const PAGES = {
     "Deliveries": Deliveries,
     "Home": Home,
     "ManageBlog": ManageBlog,
+    "MealPopularity": MealPopularity,
     "ManageSubscription": ManageSubscription,
     "MealPlanner": MealPlanner,
     "Meals": Meals,
