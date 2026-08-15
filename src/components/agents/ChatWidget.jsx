@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { agentSDK } from "@/agents";
 import { Button } from "@/components/ui/button";
@@ -8,7 +7,7 @@ import MessageBubble from "./ChatBubble";
 import { Bot, X, Send, Loader2 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
-export default function ChatWidget({ isOpen, onClose }) {
+export default function ChatWidget({ isOpen, onClose, agentName = "order_assistant", title = "Arancini AI Assistant" }) {
   const [conversation, setConversation] = useState(null);
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
@@ -16,17 +15,23 @@ export default function ChatWidget({ isOpen, onClose }) {
   const scrollAreaRef = useRef(null);
 
   useEffect(() => {
+    // Reset conversation when the agent changes so a fresh one is created
+    setConversation(null);
+    setMessages([]);
+  }, [agentName]);
+
+  useEffect(() => {
     if (isOpen && !conversation) {
       const initConversation = async () => {
         setIsLoading(true);
-        const conv = await agentSDK.createConversation({ agent_name: "order_assistant" });
+        const conv = await agentSDK.createConversation({ agent_name: agentName });
         setConversation(conv);
         setMessages(conv.messages);
         setIsLoading(false);
       };
       initConversation();
     }
-  }, [isOpen, conversation]); // Added 'conversation' to dependencies
+  }, [isOpen, conversation, agentName]); // Added 'conversation' and 'agentName' to dependencies
 
   useEffect(() => {
     if (conversation) {
@@ -75,7 +80,7 @@ export default function ChatWidget({ isOpen, onClose }) {
         <header className="flex items-center justify-between p-3 border-b border-gray-200">
           <div className="flex items-center gap-2">
             <Bot className="w-5 h-5 text-green-600" />
-            <h3 className="font-semibold text-sm">Arancini AI Assistant</h3>
+            <h3 className="font-semibold text-sm">{title}</h3>
           </div>
           <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onClose}>
             <X className="w-4 h-4" />

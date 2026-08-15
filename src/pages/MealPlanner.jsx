@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { InvokeLLM } from "@/integrations/Core";
 import { Meal } from "@/entities/Meal";
@@ -10,6 +9,7 @@ import MealPlannerForm from "../components/meal-planner/MealPlannerForm";
 import MealPlanDisplay from "../components/meal-planner/MealPlanDisplay";
 import MealPlannerLoading from "../components/meal-planner/MealPlannerLoading";
 import SwapMealModal from "../components/meal-planner/SwapMealModal";
+import ChatWidget from "../components/agents/ChatWidget";
 
 import {
   Zap,
@@ -31,6 +31,7 @@ export default function MealPlanner() {
   const [error, setError] = useState(null);
   const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
   const [swappingMealInfo, setSwappingMealInfo] = useState(null);
+  const [isCoachOpen, setIsCoachOpen] = useState(false);
   
   const { addMultipleToCart } = useCart();
 
@@ -226,6 +227,13 @@ export default function MealPlanner() {
           <p className="text-lg text-gray-600">
             Let our AI craft the perfect weekly meal plan for your goals.
           </p>
+          <Button
+            onClick={() => setIsCoachOpen(true)}
+            className="mt-4 bg-green-600 hover:bg-green-700"
+          >
+            <Zap className="w-4 h-4 mr-2" />
+            Plan my week with AI
+          </Button>
         </div>
         
         {step === 'display' && (
@@ -258,6 +266,12 @@ export default function MealPlanner() {
         allMeals={allMeals}
         swappingMealInfo={swappingMealInfo}
         preferences={preferences}
+      />
+      <ChatWidget
+        agentName="nutrition_coach"
+        title="Nutrition Coach"
+        isOpen={isCoachOpen}
+        onClose={() => setIsCoachOpen(false)}
       />
     </div>
   );

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
@@ -14,15 +13,18 @@ import {
   Users,
   DollarSign,
   Mail,
-  Loader2
+  Loader2,
+  Bot
 } from 'lucide-react';
 import { toast } from 'sonner';
+import ChatWidget from "../agents/ChatWidget";
 
 export default function ReferralSection({ user, onUserUpdate }) {
   const [referrals, setReferrals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [generatingCode, setGeneratingCode] = useState(false);
+  const [isReferralChatOpen, setIsReferralChatOpen] = useState(false);
 
   const referralUrl = user?.referral_code
     ? `${window.location.origin}?ref=${user.referral_code}`
@@ -169,6 +171,14 @@ export default function ReferralSection({ user, onUserUpdate }) {
                 <Badge className="bg-green-600">You Earn: $20 Credit</Badge>
                 <Badge className="bg-blue-600">They Get: $10 Off</Badge>
               </div>
+              <Button
+                onClick={() => setIsReferralChatOpen(true)}
+                variant="outline"
+                className="mt-4"
+              >
+                <Bot className="w-4 h-4 mr-2" />
+                Ask about my referrals
+              </Button>
             </div>
           </div>
         </CardContent>
@@ -406,6 +416,13 @@ export default function ReferralSection({ user, onUserUpdate }) {
           </div>
         </CardContent>
       </Card>
+
+      <ChatWidget
+        agentName="referral_manager"
+        title="Referral Manager"
+        isOpen={isReferralChatOpen}
+        onClose={() => setIsReferralChatOpen(false)}
+      />
     </div>
   );
 }

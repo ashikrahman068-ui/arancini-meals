@@ -84,18 +84,12 @@ function LayoutContent({ children, currentPageName }) {
         setUserRole(null); // Clear role if not authenticated
       }
       
-      // If user is on root path "/" and not authenticated, redirect to Welcome
-      if (!isAuth && location.pathname === '/') {
-        navigate(createPageUrl('Welcome'));
-      }
+      // Home is viewable without authentication — no redirect to Welcome
     } catch (error) {
       console.error("Authentication check failed:", error); // Log the error for debugging
       setIsAuthenticated(false);
       setUserRole(null); // Clear role on error
-      // If error and on root, redirect to Welcome
-      if (location.pathname === '/') {
-        navigate(createPageUrl('Welcome'));
-      }
+      // Home is viewable without authentication — no redirect on error
     } finally {
       setCheckingAuth(false);
     }
