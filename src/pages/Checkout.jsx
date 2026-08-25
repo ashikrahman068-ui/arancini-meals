@@ -114,7 +114,7 @@ export default function Checkout() {
       const checkoutItems = items.map(item => {
         const checkoutItem = {
           name: item.name,
-          description: item.description || '',
+          description: item.description || item.name || 'Meal item',
           price: item.price,
           quantity: item.quantity
         };
