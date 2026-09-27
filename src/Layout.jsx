@@ -261,26 +261,16 @@ function LayoutContent({ children, currentPageName }) {
                 />
               </div>
               <p className="text-gray-400 mb-4">
-                Delivering fresh, healthy, and delicious meal prep directly to your door. 
+                Delivering fresh, healthy, and delicious meal prep directly to your door.
                 Nutrition-focused, chef-prepared meals for your busy lifestyle.
               </p>
-              <div className="flex space-x-4 mb-6">
-                <div className="text-sm">
-                  <span className="text-green-400 font-semibold">100+</span>
-                  <span className="text-gray-400 ml-1">Happy Customers</span>
-                </div>
-                <div className="text-sm">
-                  <span className="text-green-400 font-semibold">5K+</span>
-                  <span className="text-gray-400 ml-1">Meals Delivered</span>
-                </div>
-              </div>
 
-              {/* Social Follower Counters */}
+              {/* Social Links */}
               <div className="p-4 bg-gray-800 rounded-lg border border-gray-700">
-                <h4 className="font-semibold text-white mb-3 text-sm">Our Community</h4>
+                <h4 className="font-semibold text-white mb-3 text-sm">Follow Us</h4>
                 <div className="flex gap-3">
                   <a
-                    href="https://www.facebook.com/arancinimeals"
+                    href="https://www.facebook.com/arancini_meals"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex-1 flex flex-col items-center p-3 bg-gray-900 rounded-lg hover:bg-gray-700 transition-colors group"
@@ -288,12 +278,11 @@ function LayoutContent({ children, currentPageName }) {
                     <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform mb-2">
                       <Facebook className="w-4 h-4 text-white" />
                     </div>
-                    <div className="text-xs text-gray-400 mb-1">Facebook</div>
-                    <div className="text-sm font-bold text-white">2.5K</div>
+                    <div className="text-xs text-gray-400">Facebook</div>
                   </a>
-                  
+
                   <a
-                    href="https://www.instagram.com/arancinimeals"
+                    href="https://www.instagram.com/arancini_meals"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex-1 flex flex-col items-center p-3 bg-gray-900 rounded-lg hover:bg-gray-700 transition-colors group"
@@ -301,12 +290,11 @@ function LayoutContent({ children, currentPageName }) {
                     <div className="w-8 h-8 bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform mb-2">
                       <Instagram className="w-4 h-4 text-white" />
                     </div>
-                    <div className="text-xs text-gray-400 mb-1">Instagram</div>
-                    <div className="text-sm font-bold text-white">3.8K</div>
+                    <div className="text-xs text-gray-400">Instagram</div>
                   </a>
-                  
+
                   <a
-                    href="https://www.tiktok.com/@arancinimeals"
+                    href="https://www.tiktok.com/@arancini_meals"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex-1 flex flex-col items-center p-3 bg-gray-900 rounded-lg hover:bg-gray-700 transition-colors group"
@@ -314,30 +302,29 @@ function LayoutContent({ children, currentPageName }) {
                     <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform mb-2">
                       <Music className="w-4 h-4 text-white" />
                     </div>
-                    <div className="text-xs text-gray-400 mb-1">TikTok</div>
-                    <div className="text-sm font-bold text-white">5.2K</div>
+                    <div className="text-xs text-gray-400">TikTok</div>
                   </a>
                 </div>
               </div>
             </div>
-            
+
             <div>
               <h4 className="font-semibold mb-4">Quick Links</h4>
               <ul className="space-y-2 text-sm text-gray-400">
                 <li><Link to={createPageUrl("About")} className="hover:text-white transition-colors">About Us</Link></li>
                 <li><Link to={createPageUrl("Contact")} className="hover:text-white transition-colors">Contact Us</Link></li>
-                <li><a href="#" className="hover:text-white transition-colors">How It Works</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Delivery Areas</a></li>
+                <li><Link to={`${createPageUrl("Home")}#how-it-works`} className="hover:text-white transition-colors">How It Works</Link></li>
+                <li><Link to={createPageUrl("DeliveryAreas")} className="hover:text-white transition-colors">Delivery Areas</Link></li>
               </ul>
             </div>
-            
+
             <div>
               <h4 className="font-semibold mb-4">Support</h4>
               <ul className="space-y-2 text-sm text-gray-400 mb-6">
-                <li><a href="#" className="hover:text-white transition-colors">Contact Us</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
+                <li><Link to={createPageUrl("Contact")} className="hover:text-white transition-colors">Contact Us</Link></li>
+                <li><Link to={createPageUrl("Help")} className="hover:text-white transition-colors">Help Center</Link></li>
+                <li><Link to={createPageUrl("PrivacyPolicy")} className="hover:text-white transition-colors">Privacy Policy</Link></li>
+                <li><Link to={createPageUrl("TermsOfService")} className="hover:text-white transition-colors">Terms of Service</Link></li>
               </ul>
 
               {/* Shop Location Map */}
@@ -345,7 +332,7 @@ function LayoutContent({ children, currentPageName }) {
                 <h4 className="font-semibold text-white mb-3 text-sm">Pickup Location</h4>
                 <div className="bg-gray-900 rounded-lg overflow-hidden mb-2">
                   <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3312.7806879887!2d151.15542731521!3d-33.90562098064!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6b12b1e8e8e8e8e8%3A0x0!2s377%20Enmore%20Rd%2C%20Marrickville%20NSW%202204!5e0!3m2!1sen!2sau!4v1234567890"
+                    src="https://www.google.com/maps?q=377+Enmore+Road,+Marrickville+NSW+2204,+Australia&output=embed"
                     width="100%"
                     height="100"
                     style={{ border: 0 }}

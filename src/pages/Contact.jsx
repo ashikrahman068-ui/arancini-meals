@@ -18,7 +18,7 @@ export default function Contact() {
     }
     setSending(true);
     await base44.integrations.Core.SendEmail({
-      to: "hello@arancinimeals.com.au",
+      to: "office@arancinimeals.com",
       subject: `Contact Form: ${form.name}`,
       body: `Name: ${form.name}\nEmail: ${form.email}\n\nMessage:\n${form.message}`,
     });
@@ -82,10 +82,10 @@ export default function Contact() {
             <div>
               <p className="font-semibold text-gray-900">Email</p>
               <a
-                href="mailto:hello@arancinimeals.com.au"
+                href="mailto:office@arancinimeals.com"
                 className="text-green-600 hover:underline"
               >
-                hello@arancinimeals.com.au
+                office@arancinimeals.com
               </a>
             </div>
           </div>
@@ -107,15 +107,15 @@ export default function Contact() {
             <div>
               <p className="font-semibold text-gray-900">Social Media</p>
               <div className="flex gap-3 mt-2">
-                <a href="https://www.facebook.com/arancinimeals" target="_blank" rel="noopener noreferrer"
+                <a href="https://www.facebook.com/arancini_meals" target="_blank" rel="noopener noreferrer"
                   className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center hover:opacity-80 transition-opacity">
                   <Facebook className="w-4 h-4 text-white" />
                 </a>
-                <a href="https://www.instagram.com/arancinimeals" target="_blank" rel="noopener noreferrer"
+                <a href="https://www.instagram.com/arancini_meals" target="_blank" rel="noopener noreferrer"
                   className="w-9 h-9 bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 rounded-lg flex items-center justify-center hover:opacity-80 transition-opacity">
                   <Instagram className="w-4 h-4 text-white" />
                 </a>
-                <a href="https://www.tiktok.com/@arancinimeals" target="_blank" rel="noopener noreferrer"
+                <a href="https://www.tiktok.com/@arancini_meals" target="_blank" rel="noopener noreferrer"
                   className="w-9 h-9 bg-black rounded-lg flex items-center justify-center hover:opacity-80 transition-opacity">
                   <Music className="w-4 h-4 text-white" />
                 </a>

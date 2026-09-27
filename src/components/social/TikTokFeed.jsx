@@ -6,13 +6,12 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 export default function TikTokFeed() {
   const [currentIndex, setCurrentIndex] = useState(0);
   
-  // Add your TikTok video IDs here
-  const tiktokVideos = [
-    { id: '7445087544895876383', caption: 'Healthy Meal Prep Ideas' },
-    { id: '7445087544895876384', caption: 'Quick Breakfast Recipe' },
-    { id: '7445087544895876385', caption: 'Lunch Bowl Tutorial' },
-    { id: '7445087544895876386', caption: 'Dinner Inspiration' },
-  ];
+  // TODO: once real videos are posted to https://www.tiktok.com/@arancini_meals,
+  // replace these with the real video IDs (open each video, copy the number from
+  // its URL: tiktok.com/@arancini_meals/video/<ID>). This component is not
+  // rendered on the Home page yet — see the commented-out import in Home.jsx —
+  // because there are no real videos to embed until the account is live.
+  const tiktokVideos = [];
 
   const nextSlide = () => {
     setCurrentIndex((prev) => (prev + 1) % tiktokVideos.length);
@@ -52,7 +51,7 @@ export default function TikTokFeed() {
             >
               <blockquote
                 className="tiktok-embed"
-                cite={`https://www.tiktok.com/@arancinimeals/video/${video.id}`}
+                cite={`https://www.tiktok.com/@arancini_meals/video/${video.id}`}
                 data-video-id={video.id}
                 style={{ maxWidth: '320px', minWidth: '288px' }}
               >
@@ -60,7 +59,7 @@ export default function TikTokFeed() {
                   <a
                     target="_blank"
                     rel="noopener noreferrer"
-                    href={`https://www.tiktok.com/@arancinimeals/video/${video.id}`}
+                    href={`https://www.tiktok.com/@arancini_meals/video/${video.id}`}
                   >
                     {video.caption}
                   </a>

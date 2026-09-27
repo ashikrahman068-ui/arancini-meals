@@ -19,7 +19,9 @@ import {
   Gift
 } from
 "lucide-react";
-import TikTokFeed from "../components/social/TikTokFeed";
+// TikTokFeed component is not rendered here yet — re-add once @arancini_meals has
+// real posted videos to embed (swap in their actual video IDs in TikTokFeed.jsx first).
+// import TikTokFeed from "../components/social/TikTokFeed";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -58,21 +60,15 @@ export default function Home() {
   }];
 
 
-  const testimonials = [
+  const valueProps = [
   {
-    name: "Sarah Johnson",
-    text: "Healthy Harvest transformed my eating habits. The meals are delicious and I've lost 15 pounds!",
-    rating: 5
+    text: "Every meal is chef-prepared from fresh ingredients and comes with full nutritional info, so you always know what you're eating."
   },
   {
-    name: "Mike Chen",
-    text: "Perfect for my busy schedule. Fresh, healthy meals delivered right to my door.",
-    rating: 5
+    text: "Built for busy schedules — pick your meals, we handle the planning, prepping, and cooking, delivered fresh to your door."
   },
   {
-    name: "Emma Davis",
-    text: "The variety is amazing and the nutritional info helps me stay on track with my fitness goals.",
-    rating: 5
+    text: "Flexible plans built around your goals, with the ability to pause, swap meals, or cancel any time before the weekly cutoff."
   }];
 
 
@@ -126,18 +122,6 @@ export default function Home() {
                 </Link>
               </div>
 
-              <div className="flex items-center gap-8 pt-4">
-                <div className="flex -space-x-2">
-                  {[1, 2, 3, 4].map((i) =>
-                  <div key={i} className="w-10 h-10 rounded-full bg-gradient-to-r from-green-400 to-green-500 border-2 border-white flex items-center justify-center">
-                      <span className="text-white font-semibold text-sm">🙂</span>
-                    </div>
-                  )}
-                </div>
-                <span className="text-sm font-medium text-gray-600">100+ happy customers
-
-                </span>
-              </div>
             </div>
 
             <div className="relative">
@@ -188,7 +172,7 @@ export default function Home() {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-20 bg-gradient-to-b from-green-50 to-white">
+      <section id="how-it-works" className="py-20 bg-gradient-to-b from-green-50 to-white scroll-mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -241,20 +225,17 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Testimonials Section */}
+      {/* Value Props Section */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              What Our Customers Say
+              Why People Choose Arancini Meals
             </h2>
-            <p className="text-xl text-gray-600">
-              Real stories from real people who transformed their lives
-            </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) =>
+            {valueProps.map((item, index) =>
             <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300">
                 <CardContent className="p-8">
                   <div className="flex mb-4">
@@ -262,22 +243,9 @@ export default function Home() {
                   <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
                   )}
                   </div>
-                  <p className="text-gray-600 mb-6 leading-relaxed italic">
-                    "{testimonial.text}"
+                  <p className="text-gray-600 leading-relaxed">
+                    {item.text}
                   </p>
-                  <div className="flex items-center">
-                    <div className="w-12 h-12 bg-gradient-to-r from-green-400 to-green-500 rounded-full flex items-center justify-center mr-4">
-                      <span className="text-white font-semibold">
-                        {testimonial.name.charAt(0)}
-                      </span>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-900">
-                        {testimonial.name}
-                      </h4>
-                      <p className="text-sm text-gray-500">Verified Customer</p>
-                    </div>
-                  </div>
                 </CardContent>
               </Card>
             )}
@@ -297,11 +265,9 @@ export default function Home() {
             </p>
           </div>
           
-          <TikTokFeed />
-          
-          <div className="text-center mt-12">
+          <div className="text-center">
             <a
-              href="https://www.tiktok.com/@arancinimeals"
+              href="https://www.tiktok.com/@arancini_meals"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 text-green-600 hover:text-green-700 font-semibold text-lg"
@@ -320,7 +286,7 @@ export default function Home() {
             Ready to Start Your Healthy Journey?
           </h2>
           <p className="text-xl text-green-100 mb-8 leading-relaxed">
-            Join thousands of people who have already transformed their eating habits with Arancini Meals.
+            Chef-prepared meals, delivered fresh — pick your plan and get started today.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to={createPageUrl("Meals")}>

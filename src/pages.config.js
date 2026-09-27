@@ -55,7 +55,9 @@ import Blog from './pages/Blog';
 import BlogPost from './pages/BlogPost';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
+import DeliveryAreas from './pages/DeliveryAreas';
 import Deliveries from './pages/Deliveries';
+import Help from './pages/Help';
 import Home from './pages/Home';
 import ManageBlog from './pages/ManageBlog';
 import MealPopularity from './pages/MealPopularity';
@@ -66,8 +68,10 @@ import OrderSuccess from './pages/OrderSuccess';
 import Orders from './pages/Orders';
 import PaymentCancel from './pages/PaymentCancel';
 import PaymentSuccess from './pages/PaymentSuccess';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 import SubscriptionCheckout from './pages/SubscriptionCheckout';
 import Subscriptions from './pages/Subscriptions';
+import TermsOfService from './pages/TermsOfService';
 import Welcome from './pages/Welcome';
 import __Layout from './Layout.jsx';
 
@@ -81,7 +85,9 @@ export const PAGES = {
     "BlogPost": BlogPost,
     "Cart": Cart,
     "Checkout": Checkout,
+    "DeliveryAreas": DeliveryAreas,
     "Deliveries": Deliveries,
+    "Help": Help,
     "Home": Home,
     "ManageBlog": ManageBlog,
     "MealPopularity": MealPopularity,
@@ -92,8 +98,10 @@ export const PAGES = {
     "Orders": Orders,
     "PaymentCancel": PaymentCancel,
     "PaymentSuccess": PaymentSuccess,
+    "PrivacyPolicy": PrivacyPolicy,
     "SubscriptionCheckout": SubscriptionCheckout,
     "Subscriptions": Subscriptions,
+    "TermsOfService": TermsOfService,
     "Welcome": Welcome,
 }
 
