@@ -135,8 +135,8 @@ function LayoutContent({ children, currentPageName }) {
 
   if (checkingAuth) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-green-50 to-white flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full"></div>
+      <div className="min-h-screen bg-gradient-to-b from-[color-mix(in_srgb,hsl(var(--theme-background-background-1))_100%,transparent)] to-[color-mix(in_srgb,hsl(var(--theme-background-background-2))_100%,transparent)] flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-4 border-[hsl(var(--theme-primary-border-1))] border-t-transparent rounded-full"></div>
       </div>
     );
   }
@@ -144,10 +144,10 @@ function LayoutContent({ children, currentPageName }) {
   const isRootPage = location.pathname === createPageUrl('Home') || location.pathname === '/';
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white pb-16 lg:pb-0">
+    <div className="min-h-screen bg-gradient-to-b from-[color-mix(in_srgb,hsl(var(--theme-background-background-1))_100%,transparent)] to-[color-mix(in_srgb,hsl(var(--theme-background-background-2))_100%,transparent)] pb-16 lg:pb-0">
       {/* Header */}
       <header 
-        className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-green-100"
+        className="sticky top-0 z-50 bg-[color-mix(in_srgb,hsl(var(--theme-background-background-2))_95%,transparent)] backdrop-blur-sm border-b border-[hsl(var(--theme-secondary-border-1))]"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -185,7 +185,7 @@ function LayoutContent({ children, currentPageName }) {
                   <item.icon className="w-4 h-4 mr-2" />
                   {item.name}
                   {item.name === 'Cart' && (
-                    <Badge variant="secondary" className="ml-2 bg-orange-100 text-orange-700">
+                    <Badge variant="secondary" className="ml-2 bg-[hsl(var(--theme-secondary-background-2))] text-[hsl(var(--theme-secondary-foreground-text-1))]">
                       {getTotalItems()}
                     </Badge>
                   )}
@@ -208,7 +208,7 @@ function LayoutContent({ children, currentPageName }) {
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden bg-white border-t border-green-100">
+          <div className="lg:hidden bg-[hsl(var(--theme-background-background-2))] border-t border-[hsl(var(--theme-secondary-border-1))]">
             <div className="px-4 py-3 space-y-1">
               {navigationItems.map((item) => (
                 <Link
@@ -224,7 +224,7 @@ function LayoutContent({ children, currentPageName }) {
                   <item.icon className="w-4 h-4 mr-3" />
                   {item.name}
                   {item.name === 'Cart' && (
-                    <Badge variant="secondary" className="ml-auto bg-orange-100 text-orange-700">
+                    <Badge variant="secondary" className="ml-auto bg-[hsl(var(--theme-secondary-background-2))] text-[hsl(var(--theme-secondary-foreground-text-1))]">
                       {getTotalItems()}
                     </Badge>
                   )}
@@ -249,7 +249,7 @@ function LayoutContent({ children, currentPageName }) {
       <ChatWidget isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white">
+      <footer className="bg-[hsl(var(--theme-foreground-background-1))] text-[hsl(var(--theme-background-text-1))]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="md:col-span-2">
@@ -260,49 +260,49 @@ function LayoutContent({ children, currentPageName }) {
                   className="h-16"
                 />
               </div>
-              <p className="text-gray-400 mb-4">
+              <p className="text-[hsl(var(--theme-muted-foreground-text-1))] mb-4">
                 Delivering fresh, healthy, and delicious meal prep directly to your door.
                 Nutrition-focused, chef-prepared meals for your busy lifestyle.
               </p>
 
               {/* Social Links */}
-              <div className="p-4 bg-gray-800 rounded-lg border border-gray-700">
-                <h4 className="font-semibold text-white mb-3 text-sm">Follow Us</h4>
+              <div className="p-4 bg-[hsl(var(--theme-card-background-1))] rounded-lg border border-[hsl(var(--theme-muted-border-1))]">
+                <h4 className="font-semibold text-[hsl(var(--theme-background-text-1))] mb-3 text-sm">Follow Us</h4>
                 <div className="flex gap-3">
                   <a
                     href="https://www.facebook.com/arancini_meals"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 flex flex-col items-center p-3 bg-gray-900 rounded-lg hover:bg-gray-700 transition-colors group"
+                    className="flex-1 flex flex-col items-center p-3 bg-[hsl(var(--theme-foreground-background-1))] rounded-lg hover:bg-[hsl(var(--theme-muted-background-1))] transition-colors group"
                   >
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform mb-2">
-                      <Facebook className="w-4 h-4 text-white" />
+                    <div className="w-8 h-8 bg-[hsl(var(--theme-primary-background-2))] rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform mb-2">
+                      <Facebook className="w-4 h-4 text-[hsl(var(--theme-background-text-1))]" />
                     </div>
-                    <div className="text-xs text-gray-400">Facebook</div>
+                    <div className="text-xs text-[hsl(var(--theme-muted-foreground-text-1))]">Facebook</div>
                   </a>
 
                   <a
                     href="https://www.instagram.com/arancini_meals"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 flex flex-col items-center p-3 bg-gray-900 rounded-lg hover:bg-gray-700 transition-colors group"
+                    className="flex-1 flex flex-col items-center p-3 bg-[hsl(var(--theme-foreground-background-1))] rounded-lg hover:bg-[hsl(var(--theme-muted-background-1))] transition-colors group"
                   >
-                    <div className="w-8 h-8 bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform mb-2">
-                      <Instagram className="w-4 h-4 text-white" />
+                    <div className="w-8 h-8 bg-gradient-to-br from-[color-mix(in_srgb,hsl(var(--theme-primary-background-3))_100%,transparent)] via-[color-mix(in_srgb,hsl(var(--theme-primary-background-4))_100%,transparent)] to-[color-mix(in_srgb,hsl(var(--theme-primary-background-5))_100%,transparent)] rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform mb-2">
+                      <Instagram className="w-4 h-4 text-[hsl(var(--theme-background-text-1))]" />
                     </div>
-                    <div className="text-xs text-gray-400">Instagram</div>
+                    <div className="text-xs text-[hsl(var(--theme-muted-foreground-text-1))]">Instagram</div>
                   </a>
 
                   <a
                     href="https://www.tiktok.com/@arancini_meals"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 flex flex-col items-center p-3 bg-gray-900 rounded-lg hover:bg-gray-700 transition-colors group"
+                    className="flex-1 flex flex-col items-center p-3 bg-[hsl(var(--theme-foreground-background-1))] rounded-lg hover:bg-[hsl(var(--theme-muted-background-1))] transition-colors group"
                   >
-                    <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform mb-2">
-                      <Music className="w-4 h-4 text-white" />
+                    <div className="w-8 h-8 bg-[hsl(var(--theme-foreground-background-2))] rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform mb-2">
+                      <Music className="w-4 h-4 text-[hsl(var(--theme-background-text-1))]" />
                     </div>
-                    <div className="text-xs text-gray-400">TikTok</div>
+                    <div className="text-xs text-[hsl(var(--theme-muted-foreground-text-1))]">TikTok</div>
                   </a>
                 </div>
               </div>
@@ -310,27 +310,27 @@ function LayoutContent({ children, currentPageName }) {
 
             <div>
               <h4 className="font-semibold mb-4">Quick Links</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li><Link to={createPageUrl("About")} className="hover:text-white transition-colors">About Us</Link></li>
-                <li><Link to={createPageUrl("Contact")} className="hover:text-white transition-colors">Contact Us</Link></li>
-                <li><Link to={`${createPageUrl("Home")}#how-it-works`} className="hover:text-white transition-colors">How It Works</Link></li>
-                <li><Link to={createPageUrl("DeliveryAreas")} className="hover:text-white transition-colors">Delivery Areas</Link></li>
+              <ul className="space-y-2 text-sm text-[hsl(var(--theme-muted-foreground-text-1))]">
+                <li><Link to={createPageUrl("About")} className="hover:text-[hsl(var(--theme-background-text-1))] transition-colors">About Us</Link></li>
+                <li><Link to={createPageUrl("Contact")} className="hover:text-[hsl(var(--theme-background-text-1))] transition-colors">Contact Us</Link></li>
+                <li><Link to={`${createPageUrl("Home")}#how-it-works`} className="hover:text-[hsl(var(--theme-background-text-1))] transition-colors">How It Works</Link></li>
+                <li><Link to={createPageUrl("DeliveryAreas")} className="hover:text-[hsl(var(--theme-background-text-1))] transition-colors">Delivery Areas</Link></li>
               </ul>
             </div>
 
             <div>
               <h4 className="font-semibold mb-4">Support</h4>
-              <ul className="space-y-2 text-sm text-gray-400 mb-6">
-                <li><Link to={createPageUrl("Contact")} className="hover:text-white transition-colors">Contact Us</Link></li>
-                <li><Link to={createPageUrl("Help")} className="hover:text-white transition-colors">Help Center</Link></li>
-                <li><Link to={createPageUrl("PrivacyPolicy")} className="hover:text-white transition-colors">Privacy Policy</Link></li>
-                <li><Link to={createPageUrl("TermsOfService")} className="hover:text-white transition-colors">Terms of Service</Link></li>
+              <ul className="space-y-2 text-sm text-[hsl(var(--theme-muted-foreground-text-1))] mb-6">
+                <li><Link to={createPageUrl("Contact")} className="hover:text-[hsl(var(--theme-background-text-1))] transition-colors">Contact Us</Link></li>
+                <li><Link to={createPageUrl("Help")} className="hover:text-[hsl(var(--theme-background-text-1))] transition-colors">Help Center</Link></li>
+                <li><Link to={createPageUrl("PrivacyPolicy")} className="hover:text-[hsl(var(--theme-background-text-1))] transition-colors">Privacy Policy</Link></li>
+                <li><Link to={createPageUrl("TermsOfService")} className="hover:text-[hsl(var(--theme-background-text-1))] transition-colors">Terms of Service</Link></li>
               </ul>
 
               {/* Shop Location Map */}
-              <div className="p-4 bg-gray-800 rounded-lg border border-gray-700">
-                <h4 className="font-semibold text-white mb-3 text-sm">Pickup Location</h4>
-                <div className="bg-gray-900 rounded-lg overflow-hidden mb-2">
+              <div className="p-4 bg-[hsl(var(--theme-card-background-1))] rounded-lg border border-[hsl(var(--theme-muted-border-1))]">
+                <h4 className="font-semibold text-[hsl(var(--theme-background-text-1))] mb-3 text-sm">Pickup Location</h4>
+                <div className="bg-[hsl(var(--theme-foreground-background-1))] rounded-lg overflow-hidden mb-2">
                   <iframe
                     src="https://www.google.com/maps?q=377+Enmore+Road,+Marrickville+NSW+2204,+Australia&output=embed"
                     width="100%"
@@ -342,7 +342,7 @@ function LayoutContent({ children, currentPageName }) {
                     title="Shop Location"
                   />
                 </div>
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-[hsl(var(--theme-muted-foreground-text-1))]">
                   377 Enmore Road<br />
                   Marrickville, NSW 2204
                 </p>
@@ -350,7 +350,7 @@ function LayoutContent({ children, currentPageName }) {
             </div>
           </div>
           
-          <div className="border-t border-gray-800 mt-8 pt-8 text-sm text-gray-400 text-center">
+          <div className="border-t border-[hsl(var(--theme-card-border-1))] mt-8 pt-8 text-sm text-[hsl(var(--theme-muted-foreground-text-1))] text-center">
             © 2025 Arancini Meals. All rights reserved. Made with ❤️ for healthy living.
           </div>
         </div>
