@@ -189,10 +189,15 @@
     "scheduled_date"
   ],
   "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
     "read": {
       "$or": [
         {
-          "customer_email": "{{user.email}}"
+          "data.customer_email": "{{user.email}}"
         },
         {
           "user_condition": {
@@ -201,7 +206,19 @@
         }
       ]
     },
-    "write": {
+    "update": {
+      "$or": [
+        {
+          "data.customer_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
       "user_condition": {
         "role": "admin"
       }

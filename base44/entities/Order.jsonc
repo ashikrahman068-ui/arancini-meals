@@ -131,10 +131,10 @@
     "total"
   ],
   "rls": {
-    "read": {
+    "create": {
       "$or": [
         {
-          "customer_email": "{{user.email}}"
+          "data.customer_email": "{{user.email}}"
         },
         {
           "user_condition": {
@@ -143,10 +143,34 @@
         }
       ]
     },
-    "write": {
+    "read": {
       "$or": [
         {
-          "customer_email": "{{user.email}}"
+          "data.customer_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.customer_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.customer_email": "{{user.email}}"
         },
         {
           "user_condition": {

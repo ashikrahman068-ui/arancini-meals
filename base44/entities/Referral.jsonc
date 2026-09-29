@@ -61,13 +61,13 @@
     "referred_email"
   ],
   "rls": {
-    "read": {
+    "create": {
       "$or": [
         {
-          "referrer_email": "{{user.email}}"
+          "data.referrer_email": "{{user.email}}"
         },
         {
-          "referred_email": "{{user.email}}"
+          "data.referred_email": "{{user.email}}"
         },
         {
           "user_condition": {
@@ -76,7 +76,27 @@
         }
       ]
     },
-    "write": {
+    "read": {
+      "$or": [
+        {
+          "data.referrer_email": "{{user.email}}"
+        },
+        {
+          "data.referred_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
       "user_condition": {
         "role": "admin"
       }
