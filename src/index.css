@@ -156,3 +156,62 @@ button:focus-visible {
     @apply bg-background text-foreground;
   }
 }
+
+:root {
+    --theme-background-background-1: 138.461538 76.470588% 96.666667%;
+    --theme-background-background-2: 0.000000 0.000000% 100.000000%;
+    --theme-background-text-1: 0.000000 0.000000% 100.000000%;
+    --theme-background-border-1: 0.000000 0.000000% 100.000000%;
+    --theme-primary-background-1: 142.127660 76.216216% 36.274510%;
+    --theme-primary-text-1: 142.127660 76.216216% 36.274510%;
+    --theme-primary-border-1: 142.127660 76.216216% 36.274510%;
+    --theme-secondary-background-1: 140.625000 84.210526% 92.549020%;
+    --theme-secondary-text-1: 140.625000 84.210526% 92.549020%;
+    --theme-secondary-border-1: 140.625000 84.210526% 92.549020%;
+    --theme-secondary-background-2: 34.285714 100.000000% 91.764706%;
+    --theme-secondary-border-2: 34.285714 100.000000% 91.764706%;
+    --theme-secondary-foreground-text-1: 17.472527 88.349515% 40.392157%;
+    --theme-foreground-background-1: 220.909091 39.285714% 10.980392%;
+    --theme-foreground-text-1: 220.909091 39.285714% 10.980392%;
+    --theme-muted-foreground-background-1: 217.894737 10.614525% 64.901961%;
+    --theme-muted-foreground-text-1: 217.894737 10.614525% 64.901961%;
+    --theme-card-background-1: 215.000000 27.906977% 16.862745%;
+    --theme-card-border-1: 215.000000 27.906977% 16.862745%;
+    --theme-muted-background-1: 216.923077 19.117647% 26.666667%;
+    --theme-muted-text-1: 216.923077 19.117647% 26.666667%;
+    --theme-muted-border-1: 216.923077 19.117647% 26.666667%;
+    --theme-primary-background-2: 221.212121 83.193277% 53.333333%;
+    --theme-primary-text-2: 221.212121 83.193277% 53.333333%;
+    --theme-primary-background-3: 271.475410 81.333333% 55.882353%;
+    --theme-primary-text-3: 271.475410 81.333333% 55.882353%;
+    --theme-primary-background-4: 333.333333 71.428571% 50.588235%;
+    --theme-primary-background-5: 24.581498 94.979079% 53.137255%;
+    --theme-primary-text-4: 24.581498 94.979079% 53.137255%;
+    --theme-foreground-background-2: 0.000000 0.000000% 0.000000%;
+    --theme-border-background-1: 214.285714 31.818182% 91.372549%;
+    --theme-border-border-1: 214.285714 31.818182% 91.372549%;
+    --theme-muted-background-2: 210.000000 40.000000% 98.039216%;
+    --theme-border-text-1: 212.727273 26.829268% 83.921569%;
+    --theme-border-border-2: 212.727273 26.829268% 83.921569%;
+    --theme-card-background-2: 217.241379 32.584270% 17.450980%;
+    --theme-card-text-1: 217.241379 32.584270% 17.450980%;
+    --theme-muted-foreground-text-2: 215.294118 19.318182% 34.509804%;
+    --theme-muted-background-3: 215.294118 25.000000% 26.666667%;
+    --theme-muted-text-2: 215.294118 25.000000% 26.666667%;
+    --theme-muted-background-4: 210.000000 40.000000% 96.078431%;
+    --theme-muted-text-3: 210.000000 40.000000% 96.078431%;
+    --theme-muted-border-2: 210.000000 40.000000% 96.078431%;
+    --theme-accent-background-1: 27.015707 95.979899% 60.980392%;
+    --theme-ring-text-1: 215.384615 16.317992% 46.862745%;
+    --theme-ring-ring-1: 215.384615 16.317992% 46.862745%;
+    --theme-primary-background-6: 142.429907 71.812081% 29.215686%;
+    --theme-primary-text-5: 142.429907 71.812081% 29.215686%;
+    --theme-destructive-background-1: 20.540541 90.243902% 48.235294%;
+    --theme-destructive-text-1: 20.540541 90.243902% 48.235294%;
+    --theme-card-background-3: 222.222222 47.368421% 11.176471%;
+    --theme-card-text-2: 222.222222 47.368421% 11.176471%;
+    --theme-border-border-3: 268.571429 100.000000% 91.764706%;
+    --theme-accent-background-2: 268.695652 100.000000% 95.490196%;
+    --theme-primary-background-7: 272.093023 71.666667% 47.058824%;
+    --theme-primary-text-6: 272.093023 71.666667% 47.058824%;
+}
